@@ -12,6 +12,7 @@ This project is **not affiliated with, endorsed by, or officially supported by E
 - This repository **only contains the code** to assist in answering exercises.
 - **No Educa materials (images, meshes, exercises) are included.** You must have your own access.
 - This software is for **personal, educational use only**. **Commercial use is strictly prohibited.**
+- All rights to **Educa’s materials (exercises, images, meshes, etc.) remain with their respective owners.**
 
 ________________________________________________________________________________________________________________
 
