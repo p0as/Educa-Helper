@@ -9,7 +9,7 @@ This is a personal project designed to help users complete exercises from Educa 
 This project is **not affiliated with, endorsed by, or officially supported by Educa College Prep**.
 
 ## Important:
-- This repository **only contains the code** to assist in answering exercises.
+- This repository **only contains the code** to assist in **studying and revising** the exercises.
 - **No Educa materials (images, meshes, exercises) are included.** You must have your own access.
 - This software is for **personal, educational use only**. **Commercial use is strictly prohibited.**
 - All rights to **Educa’s materials (exercises, images, meshes, etc.) remain with their respective owners.**
