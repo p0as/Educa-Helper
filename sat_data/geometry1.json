@@ -1,0 +1,34 @@
+{
+  "sections": {
+    "sectionA": {
+      "section_name": "Triangles",
+      "questions": [
+        {
+          "id": "q1",
+          "image": "images/geometry1/question1.png",
+          "answer": "30",
+          "answer_sheet": "images/geometry1/answersheet1.png",
+          "tags": [
+            "geometry",
+            "triangles"
+          ]
+        },
+        {
+          "id": "q2",
+          "image": "images/geometry1/question2.png",
+          "answer": "31",
+          "answer_sheet": "images/geometry1/answersheet2.png",
+          "tags": [
+            "geometry",
+            "triangles"
+          ]
+        }
+      ],
+      "aced_questions": []
+    },
+    "sectionB": {
+      "section_name": "Circles",
+      "questions": []
+    }
+  }
+}
