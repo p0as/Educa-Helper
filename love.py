@@ -415,6 +415,8 @@ class GameState:
         print(f"Starting session for {subject_part} with sections: {sections}")
         self.current_part = subject_part
         self.current_sections = sections
+        self.current_session = {'remaining': [], 'total_questions': 0, 'aced_in_session': set(), 'solved': set()}
+        self.load_aced_questions()  # Reload aced_questions
         all_questions = []
         for section in sections:
             questions = load_questions(subject_part, section)
@@ -425,7 +427,9 @@ class GameState:
             self.current_screen = "main_menu"
             return
         
-        # Include only unaced questions in the session
+        # Debug: Print all questions to confirm content
+        print("Questions loaded for session:", all_questions)
+        
         self.current_session['remaining'] = [q for q in all_questions 
                                           if q.get('id') not in {aq['id'] for s in self.aced_questions[subject_part].values() 
                                                                for aq in s}]
@@ -612,7 +616,7 @@ class QuizScreen:
             user_answer = self.answer_box.text.lower()
             correct_answer = self.state.current_question['answer'].lower()
             correct = user_answer == correct_answer
-            self.animation.start(correct)
+            self.animation.start(correct)  # Restore this line to trigger animation
             if correct:
                 play_safe(SOUND_CORRECT)
                 self.state.tries_left = 3
