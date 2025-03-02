@@ -340,7 +340,7 @@
           "id": "q38",
           "image": "images/geometry1/question38.png",
           "answer": "60",
-          "answer_shelti-Choiceet": "images/geometry1/answersheet38.png",
+          "answer_sheet": "images/geometry1/answersheet38.png",
           "tags": [
             "Fill-in"
           ]
