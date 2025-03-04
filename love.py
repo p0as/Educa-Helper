@@ -511,16 +511,17 @@ class GameState:
         all_questions = []
         for section in sections:
             questions = self.load_questions(subject_part, section)
-            all_questions.extend(questions)
+            # Only exclude questions aced in the current section
+            aced_ids = {aq['id'] for aq in self.aced_questions[subject_part][section]}
+            section_questions = [q for q in questions if q.get('id') not in aced_ids]
+            all_questions.extend(section_questions)
 
         if not all_questions:
             print("No questions found, returning to main menu")
             self.current_screen = "main_menu"
             return
 
-        self.current_session['remaining'] = [q for q in all_questions
-                                            if q.get('id') not in {aq['id'] for s in self.aced_questions[subject_part].values()
-                                                                  for aq in s}]
+        self.current_session['remaining'] = all_questions  # Already filtered per section
         self.current_session['aced_in_session'] = set()
         self.current_session['solved'] = set()
 
@@ -1064,7 +1065,8 @@ class AcedViewScreen:
         self.image_rect = pygame.Rect(30, 100, 500, 500)
         self.buttons = [
             Button(600, 570, 150, 50, "Unace", self.show_unace_confirmation),
-            Button(1150, 570, 120, 50, "Main Menu", lambda: setattr(self.state, 'current_screen', 'main_menu'))
+            Button(1150, 570, 120, 50, "Main Menu", lambda: setattr(self.state, 'current_screen', 'main_menu')),
+            Button(1150, 630, 120, 50, "Back", lambda: setattr(self.state, 'current_screen', 'aced_section_select'))
         ]
         self.unace_confirmation = False
         self.selected_question_id = None
@@ -1114,7 +1116,7 @@ class AcedViewScreen:
         for btn in self.buttons:
             if btn.text == "Unace":
                 btn.disabled = not aced_list or self.current_aced_index >= len(aced_list)
-            elif btn.text == "Main Menu":
+            elif btn.text in ["Main Menu", "Back"]:
                 btn.disabled = False
 
     def handle_image_click(self, pos):
@@ -1445,32 +1447,60 @@ def handle_quiz_screen(state, events, mouse_pos):
 
 def handle_aced_select(state, events, mouse_pos):
     screen.fill(WHITE)
+    
+    # Define button and layout parameters
     button_width = 200
     button_height = 50
-    spacing = 20
-    total_buttons = len(SUBJECT_PARTS)
-    total_height = total_buttons * button_height + (total_buttons - 1) * spacing
-
-    if total_height > SCREEN_HEIGHT - 100:
-        visible_buttons = (SCREEN_HEIGHT - 100) // (button_height + spacing)
-        scroll_offset = 0  # Add scrolling logic if needed
-        start_y = 100
-    else:
-        start_y = (SCREEN_HEIGHT - total_height) // 2
-
-    buttons = [
-        Button(SCREEN_WIDTH // 2 - button_width // 2, start_y + i * (button_height + spacing), button_width, button_height,
-               part.replace('1', ' 1').replace('2', ' 2').replace('3', ' 3').replace('4', ' 4').capitalize(),
-               lambda p=part: setattr(state, 'current_part', p) or setattr(state, 'current_screen', 'aced_section_select'))
-        for i, part in enumerate(SUBJECT_PARTS)
-    ]
+    spacing = 20  # Used for both vertical and horizontal spacing
+    num_columns = 3
+    total_column_width = num_columns * button_width + (num_columns - 1) * spacing  # 640 pixels
+    left_margin = (SCREEN_WIDTH - total_column_width) // 2  # 320 pixels
+    start_y = 100  # Fixed starting y-position below the title
+    
+    # Calculate buttons per column
+    total_buttons = len(SUBJECT_PARTS)  # 11
+    buttons_per_column = total_buttons // num_columns  # 3
+    remainder = total_buttons % num_columns  # 2
+    
+    buttons = []
+    current_index = 0
+    
+    # Create buttons for each column
+    for col in range(num_columns):
+        x = left_margin + col * (button_width + spacing)  # x = 320, 540, 760
+        # Determine number of buttons in this column
+        if col < remainder:
+            num_buttons = buttons_per_column + 1  # 4 for cols 0 and 1
+        else:
+            num_buttons = buttons_per_column  # 3 for col 2
+        
+        # Slice the SUBJECT_PARTS list for this column
+        column_parts = SUBJECT_PARTS[current_index:current_index + num_buttons]
+        current_index += num_buttons
+        
+        # Create buttons for this column
+        for i, part in enumerate(column_parts):
+            y = start_y + i * (button_height + spacing)  # y increases by 70 per button
+            btn = Button(
+                x, y, button_width, button_height,
+                part.replace('1', ' 1').replace('2', ' 2').replace('3', ' 3').replace('4', ' 4').capitalize(),
+                lambda p=part: setattr(state, 'current_part', p) or setattr(state, 'current_screen', 'aced_section_select'),
+                icon=FOLDER_ICON  # Add icon for consistency with handle_part_selection
+            )
+            buttons.append(btn)
+    
+    # Draw title
     title = font.render("Select Subject Part for Aced Questions", True, BLACK)
     screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 50))
+    
+    # Update and draw buttons
     for btn in buttons:
         btn.update_hover(mouse_pos)
         for event in events:
             btn.handle_event(event)
         btn.draw(screen)
+    
+    # Draw copyright
     copyright_surf = font.render(COPYRIGHT_TEXT, True, BLACK)
     screen.blit(copyright_surf, (20, SCREEN_HEIGHT - 40))
 
@@ -1576,6 +1606,15 @@ def main():
         elif state.current_screen == "aced_section_select":
             handle_aced_section_select(state, events, mouse_pos)
         if state.current_screen == "aced_view":
+            # Check if there are no aced questions
+            aced_list = state.aced_questions[state.aced_view.state.current_part][state.aced_view.state.current_section]
+            if not aced_list:
+                back_btn = Button(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2, 200, 50, "Back",
+                                  lambda: setattr(state, 'current_screen', 'main_menu'))
+                back_btn.update_hover(mouse_pos)
+                for event in events:
+                    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                        back_btn.handle_event(event)
             for btn in state.aced_view.buttons:
                 btn.update_hover(mouse_pos)
                 for event in events:
