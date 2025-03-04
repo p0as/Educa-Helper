@@ -75,17 +75,12 @@ MOTIVATIONAL_SPEECHES = [
 # Tag variations for question (sorry i forget alot)
 MULTI_CHOICE_VARIATIONS = [
     "multi_choice", "multiple choice", "multi choice", "multichoice", "multiplechoice",
-    "mcq", "multiple choice question", "multi-choice", "multiple-choice", "mc",
-    "multi choice q", "multiple choice q", "multi-choice q", "multiple-choice q",
-    "multi choice question", "multiple-choice question", "multichoice q", "multiplechoice q",
-    "mc question", "mc q"
+    "mcq", "multiple choice question", "multi-choice", "multiple-choice",
 ]
 
 FILL_IN_VARIATIONS = [
     "fill_in", "fill in", "fill-ins", "fillins", "fill in blank", "fill-in",
-    "fill in blanks", "fill-ins blank", "fillins blank", "fill-in blank",
-    "fill in the blank", "fill-in the blank", "fillins the blank", "fill-ins the blank",
-    "open ended", "open-ended", "free response", "free-response", "short answer", "short-answer"
+    "fill in blanks",
 ]
 
 # Load icons with fallback (including trophy icon) - Larger size (36x36)
@@ -116,7 +111,7 @@ else:
 # Volume and animation settings
 VOLUMES = {'click': 1.0, 'correct': 1.0, 'incorrect': 1.0}
 ANIMATION_DURATION = 2000  # 2 seconds in milliseconds
-SUBMIT_COOLDOWN = 4000  # 1 second cooldown in milliseconds
+SUBMIT_COOLDOWN = 1000  # 1 second cooldown in milliseconds
 
 # Sound initialization with error handling
 try:
@@ -376,13 +371,14 @@ class SolutionSheet:
 
 # Button class with icon support
 class Button:
-    def __init__(self, x, y, width, height, text, callback, disabled=False, icon=None):
+    def __init__(self, x, y, width, height, text, callback, disabled=False, icon=None, parent=None):
         self.rect = pygame.Rect(x, y, width, height)
         self.text = text
         self.callback = callback
         self.hovered = False
         self.disabled = disabled
         self.icon = icon
+        self.parent = parent  # Store the parent (e.g., QuizScreen or GameState)
 
     def draw(self, surface):
         color = GRAY if self.disabled else (BUTTON_HOVER_COLOR if self.hovered else BUTTON_COLOR)
@@ -406,7 +402,7 @@ class Button:
     def handle_event(self, event):
         if not self.disabled and event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.hovered:
             if self.text == "Submit" and hasattr(self, 'parent') and not self.parent.state.can_submit():
-                return  
+                return  # Do nothing (no sound, no callback) if on cooldown
             play_safe(SOUND_BUTTON_CLICK)
             self.callback()
 
@@ -431,7 +427,8 @@ class InputBox:
                 self.text += event.unicode
 
     def draw(self, screen):
-        pygame.draw.rect(screen, BLACK, self.rect, 2)
+        border_color = (0, 0, 255) if self.active else BLACK  # Blue when active, black otherwise
+        pygame.draw.rect(screen, border_color, self.rect, 2)
         text_surf = font.render(self.text, True, BLACK)
         screen.blit(text_surf, (self.rect.x + 5, self.rect.y + 5))
 
@@ -723,32 +720,36 @@ class QuizScreen:
             self.update_button_states()
 
     def check_answer(self):
-        if not self.state.can_submit():
-            return
         try:
             if not self.state.current_question:
                 return
-            user_answer = self.answer_box.text.lower().strip()  # Convert to lowercase and remove whitespace
+                
+            current_time = pygame.time.get_ticks()
+            if not self.state.can_submit():
+                self.animation.start(False)
+                self.animation.message = "Please wait before submitting again"
+                play_safe(SOUND_INCORRECT)
+                return
+                
+            user_answer = self.answer_box.text.lower().strip()
+            print(f"check_answer called with user_answer: '{user_answer}'")  # Debug log
             correct_answer = self.state.current_question['answer'].lower().strip()
-            # Check for tags to determine question type
             is_multi_choice = any(variation in (self.state.current_question.get("tags", []) or []) for variation in MULTI_CHOICE_VARIATIONS)
             is_fill_in = any(variation in (self.state.current_question.get("tags", []) or []) for variation in FILL_IN_VARIATIONS)
-            correct = user_answer == correct_answer
 
-            # Check for empty input
             if not user_answer:
                 self.animation.start(False)
                 self.animation.message = "Come on, at least try :("
                 play_safe(SOUND_INCORRECT)
                 self.answer_box.text = ""
                 self.ace_button = None
-                self.state.last_submit_time = pygame.time.get_ticks()
+                self.state.last_submit_time = current_time
                 self.update_button_states()
                 return
 
-            # Handle multi-choice questions
+            correct = user_answer == correct_answer
+
             if is_multi_choice:
-                # Ensure correct answer works for single characters (A, B, C, D)
                 if len(user_answer) == 1 and user_answer in 'abcd':
                     if correct:
                         motivational = random.choice(MOTIVATIONAL_SPEECHES)
@@ -758,9 +759,9 @@ class QuizScreen:
                         self.state.tries_left = 3
                         question_id = self.state.current_question.get('id')
                         already_aced = any(q['id'] == question_id for section in self.state.aced_questions[self.state.current_part]
-                                          for q in self.state.aced_questions[self.state.current_part][section])
+                                           for q in self.state.aced_questions[self.state.current_part][section])
                         if not already_aced:
-                            self.ace_button = Button(620, 630, 150, 40, "Ace Question", self.state.ace_question)
+                            self.ace_button = Button(620, 630, 150, 40, "Ace Question", self.state.ace_question, parent=self)
                         else:
                             self.ace_button = None
                         self.answer_box.text = ""
@@ -772,38 +773,24 @@ class QuizScreen:
                         self.state.tries_left -= 1
                         self.answer_box.text = ""
                         self.ace_button = None
-                        # No solution sheet for incorrect multi-choice answers
-                # Check for single characters (F, G, H) or other invalid options
-                elif len(user_answer) == 1 and user_answer in 'fgh':
+                elif len(user_answer) == 1 and user_answer not in 'abcd':
                     self.animation.start(False)
-                    self.animation.message = "That's not an option :("
+                    self.animation.message = "That letter is not in the answers :("
                     play_safe(SOUND_INCORRECT)
                     self.answer_box.text = ""
                     self.ace_button = None
-                    self.state.last_submit_time = pygame.time.get_ticks()
+                    self.state.last_submit_time = current_time
                     self.update_button_states()
-                    return  # No solution sheet
-                # Check for numbers
-                elif any(char.isdigit() for char in user_answer):
+                    return
+                elif any(char.isdigit() for char in user_answer) or '.' in user_answer or ',' in user_answer:
                     self.animation.start(False)
                     self.animation.message = "We are in multi-choice, not fill-ins!"
                     play_safe(SOUND_INCORRECT)
                     self.answer_box.text = ""
                     self.ace_button = None
-                    self.state.last_submit_time = pygame.time.get_ticks()
+                    self.state.last_submit_time = current_time
                     self.update_button_states()
-                    return  # No solution sheet
-                # Check for decimals or commas
-                elif '.' in user_answer or ',' in user_answer:
-                    self.animation.start(False)
-                    self.animation.message = "Only fractions allowed, decimals are not taken"
-                    play_safe(SOUND_INCORRECT)
-                    self.answer_box.text = ""
-                    self.ace_button = None
-                    self.state.last_submit_time = pygame.time.get_ticks()
-                    self.update_button_states()
-                    return  # No solution sheet
-                # Handle other incorrect multi-choice answers (e.g., longer strings or wrong answers)
+                    return
                 else:
                     if correct:
                         motivational = random.choice(MOTIVATIONAL_SPEECHES)
@@ -813,9 +800,9 @@ class QuizScreen:
                         self.state.tries_left = 3
                         question_id = self.state.current_question.get('id')
                         already_aced = any(q['id'] == question_id for section in self.state.aced_questions[self.state.current_part]
-                                          for q in self.state.aced_questions[self.state.current_part][section])
+                                           for q in self.state.aced_questions[self.state.current_part][section])
                         if not already_aced:
-                            self.ace_button = Button(620, 630, 150, 40, "Ace Question", self.state.ace_question)
+                            self.ace_button = Button(620, 630, 150, 40, "Ace Question", self.state.ace_question, parent=self)
                         else:
                             self.ace_button = None
                         self.answer_box.text = ""
@@ -827,43 +814,30 @@ class QuizScreen:
                         self.state.tries_left -= 1
                         self.answer_box.text = ""
                         self.ace_button = None
-                        # No solution sheet for incorrect multi-choice answers
 
-            # Handle fill-in questions
             elif is_fill_in:
-                # Check for single letters (A, B, C, D) - show solution sheet
                 if len(user_answer) == 1 and user_answer in 'abcd':
-                    self.animation.start(False)
-                    self.animation.message = "We are in fill-ins, not multi-choice"
-                    play_safe(SOUND_INCORRECT)
-                    self.answer_box.text = ""
-                    self.ace_button = None
-                    if self.state.tries_left == 2:  # Only show solution sheet after first wrong answer
-                        real_answer_sheet = self.state.current_question.get("answer_sheet", None)
-                        if real_answer_sheet:
-                            self.solution_sheet.start_preview("Meshes/answer_sheet.png", real_answer_sheet)
-                    self.state.tries_left -= 1
-                # Check for numbers
-                elif any(char.isdigit() for char in user_answer):
                     self.animation.start(False)
                     self.animation.message = "We are in fill-ins, not multi-choice!"
                     play_safe(SOUND_INCORRECT)
                     self.answer_box.text = ""
                     self.ace_button = None
-                    self.state.last_submit_time = pygame.time.get_ticks()
-                    self.update_button_states()
-                    return  # No solution sheet
-                # Check for decimals or commas
-                elif '.' in user_answer or ',' in user_answer:
+                    if self.state.tries_left == 2:
+                        real_answer_sheet = self.state.current_question.get("answer_sheet", None)
+                        if real_answer_sheet:
+                            self.solution_sheet.start_preview("Meshes/answer_sheet.png", real_answer_sheet)
+                    self.state.tries_left -= 1
+                elif any(char.isdigit() for char in user_answer) or '.' in user_answer or ',' in user_answer:
                     self.animation.start(False)
-                    self.animation.message = "Only fractions allowed, decimals are not taken"
+                    self.animation.message = "We are in fill-ins, not multi-choice!"
                     play_safe(SOUND_INCORRECT)
                     self.answer_box.text = ""
                     self.ace_button = None
-                    self.state.last_submit_time = pygame.time.get_ticks()
-                    self.update_button_states()
-                    return  # No solution sheet
-                # Check for correct answer in fill-ins
+                    if self.state.tries_left == 2:
+                        real_answer_sheet = self.state.current_question.get("answer_sheet", None)
+                        if real_answer_sheet:
+                            self.solution_sheet.start_preview("Meshes/answer_sheet.png", real_answer_sheet)
+                    self.state.tries_left -= 1
                 elif correct:
                     motivational = random.choice(MOTIVATIONAL_SPEECHES)
                     self.animation.start(True)
@@ -872,14 +846,13 @@ class QuizScreen:
                     self.state.tries_left = 3
                     question_id = self.state.current_question.get('id')
                     already_aced = any(q['id'] == question_id for section in self.state.aced_questions[self.state.current_part]
-                                      for q in self.state.aced_questions[self.state.current_part][section])
+                                       for q in self.state.aced_questions[self.state.current_part][section])
                     if not already_aced:
-                        self.ace_button = Button(620, 630, 150, 40, "Ace Question", self.state.ace_question)
+                        self.ace_button = Button(620, 630, 150, 40, "Ace Question", self.state.ace_question, parent=self)
                     else:
                         self.ace_button = None
                     self.answer_box.text = ""
                     self.state.current_session['solved'].add(self.current_question_index)
-                # Handle incorrect fill-in answers (non-letters, non-numbers, non-decimals/commas)
                 else:
                     self.animation.start(False)
                     self.animation.message = "Incorrect :("
@@ -887,12 +860,41 @@ class QuizScreen:
                     self.state.tries_left -= 1
                     self.answer_box.text = ""
                     self.ace_button = None
-                    if self.state.tries_left == 2:  # Only show solution sheet after first wrong answer
+                    if self.state.tries_left == 2:
                         real_answer_sheet = self.state.current_question.get("answer_sheet", None)
                         if real_answer_sheet:
                             self.solution_sheet.start_preview("Meshes/answer_sheet.png", real_answer_sheet)
 
-            self.state.last_submit_time = pygame.time.get_ticks()
+            else:
+                # Default case for untagged questions
+                print("Question type not recognized, processing as default")
+                if correct:
+                    motivational = random.choice(MOTIVATIONAL_SPEECHES)
+                    self.animation.start(True)
+                    self.animation.message = f"Correct :) {motivational}"
+                    play_safe(SOUND_CORRECT)
+                    self.state.tries_left = 3
+                    question_id = self.state.current_question.get('id')
+                    already_aced = any(q['id'] == question_id for section in self.state.aced_questions[self.state.current_part]
+                                       for q in self.state.aced_questions[self.state.current_part][section])
+                    if not already_aced:
+                        self.ace_button = Button(620, 630, 150, 40, "Ace Question", self.state.ace_question, parent=self)
+                    else:
+                        self.ace_button = None
+                    self.state.current_session['solved'].add(self.current_question_index)
+                else:
+                    self.animation.start(False)
+                    self.animation.message = "Incorrect :("
+                    play_safe(SOUND_INCORRECT)
+                    self.state.tries_left -= 1
+                    self.ace_button = None
+                    if self.state.tries_left == 2:
+                        real_answer_sheet = self.state.current_question.get("answer_sheet", None)
+                        if real_answer_sheet:
+                            self.solution_sheet.start_preview("Meshes/answer_sheet.png", real_answer_sheet)
+                self.answer_box.text = ""
+
+            self.state.last_submit_time = current_time
             self.update_button_states()
         except Exception as e:
             print(f"Error in check_answer: {e}")
@@ -909,11 +911,11 @@ class QuizScreen:
             elif btn.text == "Skip":
                 btn.disabled = not remaining
             elif btn.text == "Submit":
-                btn.disabled = not self.state.current_question  # Only disable if no current question
+                btn.disabled = not self.state.current_question or not self.state.can_submit()  # Disable during cooldown
         if self.ace_button:
             question_id = self.state.current_question.get('id')
             already_aced = any(q['id'] == question_id for section in self.state.aced_questions[self.state.current_part]
-                              for q in self.state.aced_questions[self.state.current_part][section])
+                               for q in self.state.aced_questions[self.state.current_part][section])
             if already_aced:
                 self.ace_button = None
 
@@ -940,6 +942,8 @@ class QuizScreen:
             return
 
         if self.state.current_question:
+            self.update_button_states()  # Update button states every frame
+
             if "tags" in self.state.current_question:
                 tags_text = ", ".join(self.state.current_question["tags"])
                 tags_surf = font.render(f"Tags: {tags_text}", True, BLACK)
@@ -1014,7 +1018,7 @@ class QuizScreen:
             if self.state.show_answer:
                 answer_text = large_font.render(self.state.current_question['answer'], True, BLACK)
                 screen.blit(answer_text, (SCREEN_WIDTH // 2 - answer_text.get_width() // 2 - 100,
-                                         SCREEN_HEIGHT // 2 - answer_text.get_height() // 2))
+                                          SCREEN_HEIGHT // 2 - answer_text.get_height() // 2))
 
             self.animation.update()
             if pygame.time.get_ticks() - self.animation.start_time < ANIMATION_DURATION + 500:

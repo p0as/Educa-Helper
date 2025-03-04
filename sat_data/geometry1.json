@@ -365,36 +365,6 @@
             "Multi-Choice"
           ],
           "section_name": "Reviewing Basic Geometry Facts"
-        },
-        {
-          "id": "q2",
-          "image": "images/geometry1/question2.png",
-          "answer": "B",
-          "answer_sheet": "images/geometry1/answersheet2.png",
-          "tags": [
-            "Multi-Choice"
-          ],
-          "section_name": "Reviewing Basic Geometry Facts"
-        },
-        {
-          "id": "q3",
-          "image": "images/geometry1/question3.png",
-          "answer": "B",
-          "answer_sheet": "images/geometry1/answersheet3.png",
-          "tags": [
-            "Multi-Choice"
-          ],
-          "section_name": "Reviewing Basic Geometry Facts"
-        },
-        {
-          "id": "q4",
-          "image": "images/geometry1/question4.png",
-          "answer": "D",
-          "answer_sheet": "images/geometry1/answersheet4.png",
-          "tags": [
-            "Multi-Choice"
-          ],
-          "section_name": "Reviewing Basic Geometry Facts"
         }
       ]
     },
