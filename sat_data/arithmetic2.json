@@ -1,0 +1,14 @@
+{
+  "sections": {
+    "sectionA": {
+      "section_name": "Section A",
+      "questions": [],
+      "aced_questions": []
+    },
+    "sectionB": {
+      "section_name": "Section B",
+      "questions": [],
+      "aced_questions": []
+    }
+  }
+}

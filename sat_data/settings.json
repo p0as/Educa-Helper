@@ -1,5 +1,6 @@
 {
+  "randomize": false,
   "click": 0.075,
-  "correct": 0.965,
-  "incorrect": 1.0
+  "correct": 0.665,
+  "incorrect": 0.15
 }

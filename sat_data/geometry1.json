@@ -355,18 +355,7 @@
           ]
         }
       ],
-      "aced_questions": [
-        {
-          "id": "q1",
-          "image": "images/geometry1/question1.png",
-          "answer": "B",
-          "answer_sheet": "images/geometry1/answersheet1.png",
-          "tags": [
-            "Multi-Choice"
-          ],
-          "section_name": "Reviewing Basic Geometry Facts"
-        }
-      ]
+      "aced_questions": []
     },
     "sectionB": {
       "section_name": "Area of Plane Figures",
