@@ -72,6 +72,7 @@ MOTIVATIONAL_SPEECHES = [
     "Phenomenal work!",
     "You're the best!"
 ]
+
 # Tag variations for question (sorry i forget alot)
 MULTI_CHOICE_VARIATIONS = [
     "multi_choice", "multiple choice", "multi choice", "multichoice", "multiplechoice",
