@@ -1,12 +1,485 @@
 {
   "sections": {
     "sectionA": {
-      "section_name": "Section A",
-      "questions": []
+      "section_name": "Circles and its Equations",
+      "questions": [
+        {
+          "id": "q1",
+          "image": "images/geometry2/question1.png",
+          "answer": "B",
+          "answer_sheet": "images/geometry2/answersheet1.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q2",
+          "image": "images/geometry2/question2.png",
+          "answer": "C",
+          "answer_sheet": "images/geometry2/answersheet2.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q3",
+          "image": "images/geometry2/question3.png",
+          "answer": "B",
+          "answer_sheet": "images/geometry2/answersheet3.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q4",
+          "image": "images/geometry2/question4.png",
+          "answer": "B",
+          "answer_sheet": "images/geometry2/answersheet4.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q5",
+          "image": "images/geometry2/question5.png",
+          "answer": "C",
+          "answer_sheet": "images/geometry2/answersheet5.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q6",
+          "image": "images/geometry2/question6.png",
+          "answer": "A",
+          "answer_sheet": "images/geometry2/answersheet6.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q7",
+          "image": "images/geometry2/question7.png",
+          "answer": "D",
+          "answer_sheet": "images/geometry2/answersheet7.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q8",
+          "image": "images/geometry2/question8.png",
+          "answer": "D",
+          "answer_sheet": "images/geometry2/answersheet8.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q9",
+          "image": "images/geometry2/question9.png",
+          "answer": "B",
+          "answer_sheet": "images/geometry2/answersheet9.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q10",
+          "image": "images/geometry2/question10.png",
+          "answer": "C",
+          "answer_sheet": "images/geometry2/answersheet10.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q11",
+          "image": "images/geometry2/question11.png",
+          "answer": "A",
+          "answer_sheet": "images/geometry2/answersheet11.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q12",
+          "image": "images/geometry2/question12.png",
+          "answer": "B",
+          "answer_sheet": "images/geometry2/answersheet12.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q13",
+          "image": "images/geometry2/question13.png",
+          "answer": "C",
+          "answer_sheet": "images/geometry2/answersheet13.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q14",
+          "image": "images/geometry2/question14.png",
+          "answer": "C",
+          "answer_sheet": "images/geometry2/answersheet14.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q15",
+          "image": "images/geometry2/question15.png",
+          "answer": "D",
+          "answer_sheet": "images/geometry2/answersheet15.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q16",
+          "image": "images/geometry2/question16.png",
+          "answer": "D",
+          "answer_sheet": "images/geometry2/answersheet16.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q17",
+          "image": "images/geometry2/question17.png",
+          "answer": "A",
+          "answer_sheet": "images/geometry2/answersheet17.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q18",
+          "image": "images/geometry2/question18.png",
+          "answer": "C",
+          "answer_sheet": "images/geometry2/answersheet18.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q19",
+          "image": "images/geometry2/question19.png",
+          "answer": "C",
+          "answer_sheet": "images/geometry2/answersheet19.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q20",
+          "image": "images/geometry2/question20.png",
+          "answer": "B",
+          "answer_sheet": "images/geometry2/answersheet20.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q21",
+          "image": "images/geometry2/question21.png",
+          "answer": "B",
+          "answer_sheet": "images/geometry2/answersheet21.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q22",
+          "image": "images/geometry2/question22.png",
+          "answer": "D",
+          "answer_sheet": "images/geometry2/answersheet22.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q23",
+          "image": "images/geometry2/question23.png",
+          "answer": "A",
+          "answer_sheet": "images/geometry2/answersheet23.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q24",
+          "image": "images/geometry2/question24.png",
+          "answer": "B",
+          "answer_sheet": "images/geometry2/answersheet24.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q25",
+          "image": "images/geometry2/question25.png",
+          "answer": "A",
+          "answer_sheet": "images/geometry2/answersheet25.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q26",
+          "image": "images/geometry2/question26.png",
+          "answer": "D",
+          "answer_sheet": "images/geometry2/answersheet26.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q27",
+          "image": "images/geometry2/question27.png",
+          "answer": "2",
+          "answer_sheet": "images/geometry2/answersheet27.png",
+          "tags": ["Fill-in"]
+        },
+        {
+          "id": "q28",
+          "image": "images/geometry2/question28.png",
+          "answer": "1/16",
+          "answer_sheet": "images/geometry2/answersheet28.png",
+          "tags": ["Fill-in"]
+        },
+        {
+          "id": "q29",
+          "image": "images/geometry2/question29.png",
+          "answer": "5/12",
+          "answer_sheet": "images/geometry2/answersheet29.png",
+          "tags": ["Fill-in"]
+        },
+        {
+          "id": "q30",
+          "image": "images/geometry2/question30.png",
+          "answer": "13",
+          "answer_sheet": "images/geometry2/answersheet30.png",
+          "tags": ["Fill-in"]
+        },
+        {
+          "id": "q31",
+          "image": "images/geometry2/question31.png",
+          "answer": "8",
+          "answer_sheet": "images/geometry2/answersheet31.png",
+          "tags": ["Fill-in"]
+        },
+        {
+          "id": "q32",
+          "image": "images/geometry2/question32.png",
+          "answer": "13.1",
+          "answer_sheet": "images/geometry2/answersheet32.png",
+          "tags": ["Fill-in"]
+        },
+        {
+          "id": "q33",
+          "image": "images/geometry2/question33.png",
+          "answer": "40",
+          "answer_sheet": "images/geometry2/answersheet33.png",
+          "tags": ["Fill-in"]
+        }
+      ],
+      "aced_questions": []
     },
     "sectionB": {
-      "section_name": "Section B",
-      "questions": []
+      "section_name": "Solid Figures",
+      "questions": [
+        {
+          "id": "q1",
+          "image": "images/geometry2/sectionB_question1.png",
+          "answer": "A",
+          "answer_sheet": "images/geometry2/sectionB_answersheet1.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q2",
+          "image": "images/geometry2/sectionB_question2.png",
+          "answer": "B",
+          "answer_sheet": "images/geometry2/sectionB_answersheet2.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q3",
+          "image": "images/geometry2/sectionB_question3.png",
+          "answer": "C",
+          "answer_sheet": "images/geometry2/sectionB_answersheet3.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q4",
+          "image": "images/geometry2/sectionB_question4.png",
+          "answer": "A",
+          "answer_sheet": "images/geometry2/sectionB_answersheet4.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q5",
+          "image": "images/geometry2/sectionB_question5.png",
+          "answer": "C",
+          "answer_sheet": "images/geometry2/sectionB_answersheet5.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q6",
+          "image": "images/geometry2/sectionB_question6.png",
+          "answer": "A",
+          "answer_sheet": "images/geometry2/sectionB_answersheet6.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q7",
+          "image": "images/geometry2/sectionB_question7.png",
+          "answer": "C",
+          "answer_sheet": "images/geometry2/sectionB_answersheet7.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q8",
+          "image": "images/geometry2/sectionB_question8.png",
+          "answer": "B",
+          "answer_sheet": "images/geometry2/sectionB_answersheet8.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q9",
+          "image": "images/geometry2/sectionB_question9.png",
+          "answer": "D",
+          "answer_sheet": "images/geometry2/sectionB_answersheet9.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q10",
+          "image": "images/geometry2/sectionB_question10.png",
+          "answer": "A",
+          "answer_sheet": "images/geometry2/sectionB_answersheet10.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q11",
+          "image": "images/geometry2/sectionB_question11.png",
+          "answer": "B",
+          "answer_sheet": "images/geometry2/sectionB_answersheet11.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q12",
+          "image": "images/geometry2/sectionB_question12.png",
+          "answer": "A",
+          "answer_sheet": "images/geometry2/sectionB_answersheet12.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q13",
+          "image": "images/geometry2/sectionB_question13.png",
+          "answer": "B",
+          "answer_sheet": "images/geometry2/sectionB_answersheet13.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q14",
+          "image": "images/geometry2/sectionB_question14.png",
+          "answer": "D",
+          "answer_sheet": "images/geometry2/sectionB_answersheet14.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q15",
+          "image": "images/geometry2/sectionB_question15.png",
+          "answer": "A",
+          "answer_sheet": "images/geometry2/sectionB_answersheet15.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q16",
+          "image": "images/geometry2/sectionB_question16.png",
+          "answer": "D",
+          "answer_sheet": "images/geometry2/sectionB_answersheet16.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q17",
+          "image": "images/geometry2/sectionB_question17.png",
+          "answer": "A",
+          "answer_sheet": "images/geometry2/sectionB_answersheet17.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q18",
+          "image": "images/geometry2/sectionB_question18.png",
+          "answer": "A",
+          "answer_sheet": "images/geometry2/sectionB_answersheet18.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q19",
+          "image": "images/geometry2/sectionB_question19.png",
+          "answer": "C",
+          "answer_sheet": "images/geometry2/sectionB_answersheet19.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q20",
+          "image": "images/geometry2/sectionB_question20.png",
+          "answer": "D",
+          "answer_sheet": "images/geometry2/sectionB_answersheet20.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q21",
+          "image": "images/geometry2/sectionB_question21.png",
+          "answer": "A",
+          "answer_sheet": "images/geometry2/sectionB_answersheet21.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q22",
+          "image": "images/geometry2/sectionB_question22.png",
+          "answer": "C",
+          "answer_sheet": "images/geometry2/sectionB_answersheet22.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q23",
+          "image": "images/geometry2/sectionB_question23.png",
+          "answer": "B",
+          "answer_sheet": "images/geometry2/sectionB_answersheet23.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q24",
+          "image": "images/geometry2/sectionB_question24.png",
+          "answer": "D",
+          "answer_sheet": "images/geometry2/sectionB_answersheet24.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q25",
+          "image": "images/geometry2/sectionB_question25.png",
+          "answer": "60",
+          "answer_sheet": "images/geometry2/sectionB_answersheet25.png",
+          "tags": ["Fill-in"]
+        },
+        {
+          "id": "q26",
+          "image": "images/geometry2/sectionB_question26.png",
+          "answer": "8",
+          "answer_sheet": "images/geometry2/sectionB_answersheet26.png",
+          "tags": ["Fill-in"]
+        },
+        {
+          "id": "q27",
+          "image": "images/geometry2/sectionB_question27.png",
+          "answer": "110",
+          "answer_sheet": "images/geometry2/sectionB_answersheet27.png",
+          "tags": ["Fill-in"]
+        },
+        {
+          "id": "q28",
+          "image": "images/geometry2/sectionB_question28.png",
+          "answer": "121",
+          "answer_sheet": "images/geometry2/sectionB_answersheet28.png",
+          "tags": ["Fill-in"]
+        },
+        {
+          "id": "q29",
+          "image": "images/geometry2/sectionB_question29.png",
+          "answer": "24",
+          "answer_sheet": "images/geometry2/sectionB_answersheet29.png",
+          "tags": ["Fill-in"]
+        },
+        {
+          "id": "q30",
+          "image": "images/geometry2/sectionB_question30.png",
+          "answer": "12.3",
+          "answer_sheet": "images/geometry2/sectionB_answersheet30.png",
+          "tags": ["Fill-in"]
+        },
+        {
+          "id": "q31",
+          "image": "images/geometry2/sectionB_question31.png",
+          "answer": "1728",
+          "answer_sheet": "images/geometry2/sectionB_answersheet31.png",
+          "tags": ["Fill-in"]
+        },
+        {
+          "id": "q32",
+          "image": "images/geometry2/sectionB_question32.png",
+          "answer": "3.75",
+          "answer_sheet": "images/geometry2/sectionB_answersheet32.png",
+          "tags": ["Fill-in"]
+        },
+        {
+          "id": "q33",
+          "image": "images/geometry2/sectionB_question33.png",
+          "answer": "60",
+          "answer_sheet": "images/geometry2/sectionB_answersheet33.png",
+          "tags": ["Fill-in"]
+        },
+        {
+          "id": "q34",
+          "image": "images/geometry2/sectionB_question34.png",
+          "answer": "10",
+          "answer_sheet": "images/geometry2/sectionB_answersheet34.png",
+          "tags": ["Fill-in"]
+        }
+      ],
+      "aced_questions": []
     }
   }
 }
