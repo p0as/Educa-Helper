@@ -1,14 +1,69 @@
 {
   "sections": {
     "sectionA": {
-      "section_name": "Section A",
-      "questions": [],
-      "aced_questions": []
+      "section_name": "Ratios and Variation",
+      "questions": [
+        {"id": "q1", "image": "images/arithmetic2/sectionA/question1.png", "answer": "C", "answer_sheet": "images/arithmetic2/sectionA/answersheet1.png", "tags": ["Multi-Choice"]},
+        {"id": "q2", "image": "images/arithmetic2/sectionA/question2.png", "answer": "D", "answer_sheet": "images/arithmetic2/sectionA/answersheet2.png", "tags": ["Multi-Choice"]},
+        {"id": "q3", "image": "images/arithmetic2/sectionA/question3.png", "answer": "C", "answer_sheet": "images/arithmetic2/sectionA/answersheet3.png", "tags": ["Multi-Choice"]},
+        {"id": "q4", "image": "images/arithmetic2/sectionA/question4.png", "answer": "D", "answer_sheet": "images/arithmetic2/sectionA/answersheet4.png", "tags": ["Multi-Choice"]},
+        {"id": "q5", "image": "images/arithmetic2/sectionA/question5.png", "answer": "C", "answer_sheet": "images/arithmetic2/sectionA/answersheet5.png", "tags": ["Multi-Choice"]},
+        {"id": "q6", "image": "images/arithmetic2/sectionA/question6.png", "answer": "D", "answer_sheet": "images/arithmetic2/sectionA/answersheet6.png", "tags": ["Multi-Choice"]},
+        {"id": "q7", "image": "images/arithmetic2/sectionA/question7.png", "answer": "A", "answer_sheet": "images/arithmetic2/sectionA/answersheet7.png", "tags": ["Multi-Choice"]},
+        {"id": "q8", "image": "images/arithmetic2/sectionA/question8.png", "answer": "D", "answer_sheet": "images/arithmetic2/sectionA/answersheet8.png", "tags": ["Multi-Choice"]},
+        {"id": "q9", "image": "images/arithmetic2/sectionA/question9.png", "answer": "C", "answer_sheet": "images/arithmetic2/sectionA/answersheet9.png", "tags": ["Multi-Choice"]},
+        {"id": "q10", "image": "images/arithmetic2/sectionA/question10.png", "answer": "B", "answer_sheet": "images/arithmetic2/sectionA/answersheet10.png", "tags": ["Multi-Choice"]},
+        {"id": "q11", "image": "images/arithmetic2/sectionA/question11.png", "answer": "C", "answer_sheet": "images/arithmetic2/sectionA/answersheet11.png", "tags": ["Multi-Choice"]},
+        {"id": "q12", "image": "images/arithmetic2/sectionA/question12.png", "answer": "C", "answer_sheet": "images/arithmetic2/sectionA/answersheet12.png", "tags": ["Multi-Choice"]},
+        {"id": "q13", "image": "images/arithmetic2/sectionA/question13.png", "answer": "D", "answer_sheet": "images/arithmetic2/sectionA/answersheet13.png", "tags": ["Multi-Choice"]},
+        {"id": "q14", "image": "images/arithmetic2/sectionA/question14.png", "answer": "D", "answer_sheet": "images/arithmetic2/sectionA/answersheet14.png", "tags": ["Multi-Choice"]},
+        {"id": "q15", "image": "images/arithmetic2/sectionA/question15.png", "answer": "A", "answer_sheet": "images/arithmetic2/sectionA/answersheet15.png", "tags": ["Multi-Choice"]},
+        {"id": "q16", "image": "images/arithmetic2/sectionA/question16.png", "answer": "C", "answer_sheet": "images/arithmetic2/sectionA/answersheet16.png", "tags": ["Multi-Choice"]},
+        {"id": "q17", "image": "images/arithmetic2/sectionA/question17.png", "answer": "A", "answer_sheet": "images/arithmetic2/sectionA/answersheet17.png", "tags": ["Multi-Choice"]},
+        {"id": "q18", "image": "images/arithmetic2/sectionA/question18.png", "answer": "B", "answer_sheet": "images/arithmetic2/sectionA/answersheet18.png", "tags": ["Multi-Choice"]},
+        {"id": "q19", "image": "images/arithmetic2/sectionA/question19.png", "answer": "C", "answer_sheet": "images/arithmetic2/sectionA/answersheet19.png", "tags": ["Multi-Choice"]},
+        {"id": "q20", "image": "images/arithmetic2/sectionA/question20.png", "answer": "A", "answer_sheet": "images/arithmetic2/sectionA/answersheet20.png", "tags": ["Multi-Choice"]},
+        {"id": "q21", "image": "images/arithmetic2/sectionA/question21.png", "answer": "B", "answer_sheet": "images/arithmetic2/sectionA/answersheet21.png", "tags": ["Multi-Choice"]},
+        {"id": "q22", "image": "images/arithmetic2/sectionA/question22.png", "answer": "C", "answer_sheet": "images/arithmetic2/sectionA/answersheet22.png", "tags": ["Multi-Choice"]},
+        {"id": "q23", "image": "images/arithmetic2/sectionA/question23.png", "answer": "C", "answer_sheet": "images/arithmetic2/sectionA/answersheet23.png", "tags": ["Multi-Choice"]},
+        {"id": "q24", "image": "images/arithmetic2/sectionA/question24.png", "answer": "A", "answer_sheet": "images/arithmetic2/sectionA/answersheet24.png", "tags": ["Multi-Choice"]},
+        {"id": "q25", "image": "images/arithmetic2/sectionA/question25.png", "answer": "D", "answer_sheet": "images/arithmetic2/sectionA/answersheet25.png", "tags": ["Multi-Choice"]},
+        {"id": "q26", "image": "images/arithmetic2/sectionA/question26.png", "answer": "B", "answer_sheet": "images/arithmetic2/sectionA/answersheet26.png", "tags": ["Multi-Choice"]},
+        {"id": "q27", "image": "images/arithmetic2/sectionA/question27.png", "answer": "B", "answer_sheet": "images/arithmetic2/sectionA/answersheet27.png", "tags": ["Multi-Choice"]},
+        {"id": "q28", "image": "images/arithmetic2/sectionA/question28.png", "answer": "C", "answer_sheet": "images/arithmetic2/sectionA/answersheet28.png", "tags": ["Multi-Choice"]},
+        {"id": "q29", "image": "images/arithmetic2/sectionA/question29.png", "answer": "C", "answer_sheet": "images/arithmetic2/sectionA/answersheet29.png", "tags": ["Multi-Choice"]},
+        {"id": "q30", "image": "images/arithmetic2/sectionA/question30.png", "answer": "12", "answer_sheet": "images/arithmetic2/sectionA/answersheet30.png", "tags": ["Fill-in"]},
+        {"id": "q31", "image": "images/arithmetic2/sectionA/question31.png", "answer": "15", "answer_sheet": "images/arithmetic2/sectionA/answersheet31.png", "tags": ["Fill-in"]},
+        {"id": "q32", "image": "images/arithmetic2/sectionA/question32.png", "answer": "4", "answer_sheet": "images/arithmetic2/sectionA/answersheet32.png", "tags": ["Fill-in"]},
+        {"id": "q33", "image": "images/arithmetic2/sectionA/question33.png", "answer": "16", "answer_sheet": "images/arithmetic2/sectionA/answersheet33.png", "tags": ["Fill-in"]},
+        {"id": "q34", "image": "images/arithmetic2/sectionA/question34.png", "answer": "2/9", "answer_sheet": "images/arithmetic2/sectionA/answersheet34.png", "tags": ["Fill-in"]}
+      ]
     },
     "sectionB": {
-      "section_name": "Section B",
-      "questions": [],
-      "aced_questions": []
+      "section_name": "Rate Problems",
+      "questions": [
+        {"id": "q1", "image": "images/arithmetic2/sectionB/question1.png", "answer": "C", "answer_sheet": "images/arithmetic2/sectionB/answersheet1.png", "tags": ["Multi-Choice"]},
+        {"id": "q2", "image": "images/arithmetic2/sectionB/question2.png", "answer": "B", "answer_sheet": "images/arithmetic2/sectionB/answersheet2.png", "tags": ["Multi-Choice"]},
+        {"id": "q3", "image": "images/arithmetic2/sectionB/question3.png", "answer": "D", "answer_sheet": "images/arithmetic2/sectionB/answersheet3.png", "tags": ["Multi-Choice"]},
+        {"id": "q4", "image": "images/arithmetic2/sectionB/question4.png", "answer": "B", "answer_sheet": "images/arithmetic2/sectionB/answersheet4.png", "tags": ["Multi-Choice"]},
+        {"id": "q5", "image": "images/arithmetic2/sectionB/question5.png", "answer": "D", "answer_sheet": "images/arithmetic2/sectionB/answersheet5.png", "tags": ["Multi-Choice"]},
+        {"id": "q6", "image": "images/arithmetic2/sectionB/question6.png", "answer": "A", "answer_sheet": "images/arithmetic2/sectionB/answersheet6.png", "tags": ["Multi-Choice"]},
+        {"id": "q7", "image": "images/arithmetic2/sectionB/question7.png", "answer": "D", "answer_sheet": "images/arithmetic2/sectionB/answersheet7.png", "tags": ["Multi-Choice"]},
+        {"id": "q8", "image": "images/arithmetic2/sectionB/question8.png", "answer": "D", "answer_sheet": "images/arithmetic2/sectionB/answersheet8.png", "tags": ["Multi-Choice"]},
+        {"id": "q9", "image": "images/arithmetic2/sectionB/question9.png", "answer": "C", "answer_sheet": "images/arithmetic2/sectionB/answersheet9.png", "tags": ["Multi-Choice"]},
+        {"id": "q10", "image": "images/arithmetic2/sectionB/question10.png", "answer": "B", "answer_sheet": "images/arithmetic2/sectionB/answersheet10.png", "tags": ["Multi-Choice"]},
+        {"id": "q11", "image": "images/arithmetic2/sectionB/question11.png", "answer": "D", "answer_sheet": "images/arithmetic2/sectionB/answersheet11.png", "tags": ["Multi-Choice"]},
+        {"id": "q12", "image": "images/arithmetic2/sectionB/question12.png", "answer": "B", "answer_sheet": "images/arithmetic2/sectionB/answersheet12.png", "tags": ["Multi-Choice"]},
+        {"id": "q13", "image": "images/arithmetic2/sectionB/question13.png", "answer": "A", "answer_sheet": "images/arithmetic2/sectionB/answersheet13.png", "tags": ["Multi-Choice"]},
+        {"id": "q14", "image": "images/arithmetic2/sectionB/question14.png", "answer": "A", "answer_sheet": "images/arithmetic2/sectionB/answersheet14.png", "tags": ["Multi-Choice"]},
+        {"id": "q15", "image": "images/arithmetic2/sectionB/question15.png", "answer": "A", "answer_sheet": "images/arithmetic2/sectionB/answersheet15.png", "tags": ["Multi-Choice"]},
+        {"id": "q16", "image": "images/arithmetic2/sectionB/question16.png", "answer": "D", "answer_sheet": "images/arithmetic2/sectionB/answersheet16.png", "tags": ["Multi-Choice"]},
+        {"id": "q17", "image": "images/arithmetic2/sectionB/question17.png", "answer": "C", "answer_sheet": "images/arithmetic2/sectionB/answersheet17.png", "tags": ["Multi-Choice"]},
+        {"id": "q18", "image": "images/arithmetic2/sectionB/question18.png", "answer": "8.0", "answer_sheet": "images/arithmetic2/sectionB/answersheet18.png", "tags": ["Fill-in"]},
+        {"id": "q19", "image": "images/arithmetic2/sectionB/question19.png", "answer": "12", "answer_sheet": "images/arithmetic2/sectionB/answersheet19.png", "tags": ["Fill-in"]},
+        {"id": "q20", "image": "images/arithmetic2/sectionB/question20.png", "answer": "52", "answer_sheet": "images/arithmetic2/sectionB/answersheet20.png", "tags": ["Fill-in"]},
+        {"id": "q21", "image": "images/arithmetic2/sectionB/question21.png", "answer": "12", "answer_sheet": "images/arithmetic2/sectionB/answersheet21.png", "tags": ["Fill-in"]}
+      ]
     }
   }
 }
