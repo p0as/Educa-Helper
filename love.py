@@ -1483,7 +1483,7 @@ def handle_settings_screen(state, events, mouse_pos):
     
 def handle_part_selection(state, events, mouse_pos):
     screen.fill(WHITE)
-    button_width = 200  # Minimum width
+    button_width = 200 
     button_height = 50
     spacing = 20
     num_columns = 3
@@ -1511,7 +1511,6 @@ def handle_part_selection(state, events, mouse_pos):
             )
             buttons.append(btn)
 
-    # Add back button at the bottom, centered
     back_btn = Button(
         SCREEN_WIDTH // 2 - button_width // 2, SCREEN_HEIGHT - button_height - 20,
         button_width, button_height, "Back",
@@ -1532,7 +1531,7 @@ def handle_part_selection(state, events, mouse_pos):
 
 def handle_aced_section_select(state, events, mouse_pos):
     screen.fill(WHITE)
-    button_width = 320  # Increased from 300
+    button_width = 320
     button_height = 50
     spacing = 20
     sections = state.all_data[state.current_part].get("sections", {})
@@ -1708,7 +1707,7 @@ def handle_quiz_screen(state, events, mouse_pos):
         
 def handle_section_selection(state, events, mouse_pos):
     screen.fill(WHITE)
-    button_width = 320  # Increased from 300
+    button_width = 320
     button_height = 50
     spacing = 20
     sections = state.all_data[state.current_part].get("sections", {})
@@ -1782,7 +1781,6 @@ def main():
         draw_loading_screen(screen, message)
         state.all_data[part] = data
         loaded_files += 1
-        # Optional: Add a progress indicator (e.g., "X/Y files loaded")
         progress_message = f"{loaded_files}/{total_files} files loaded"
         progress_text = font.render(progress_message, True, WHITE)
         progress_rect = progress_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 50))
