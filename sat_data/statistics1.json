@@ -1,14 +1,159 @@
 {
   "sections": {
     "sectionA": {
-      "section_name": "Section A",
-      "questions": [],
-      "aced_questions": []
+      "section_name": "Data Collection Methods",
+      "questions": [
+        {
+          "id": "q1",
+          "image": "images/statistics1/sectionA/question1.png",
+          "answer": "C",
+          "answer_sheet": "images/statistics1/sectionA/answersheet1.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q2",
+          "image": "images/statistics1/sectionA/question2.png",
+          "answer": "B",
+          "answer_sheet": "images/statistics1/sectionA/answersheet2.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q3",
+          "image": "images/statistics1/sectionA/question3.png",
+          "answer": "D",
+          "answer_sheet": "images/statistics1/sectionA/answersheet3.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q4",
+          "image": "images/statistics1/sectionA/question4.png",
+          "answer": "C",
+          "answer_sheet": "images/statistics1/sectionA/answersheet4.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q5",
+          "image": "images/statistics1/sectionA/question5.png",
+          "answer": "D",
+          "answer_sheet": "images/statistics1/sectionA/answersheet5.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q6",
+          "image": "images/statistics1/sectionA/question6.png",
+          "answer": "A",
+          "answer_sheet": "images/statistics1/sectionA/answersheet6.png",
+          "tags": ["Multi-Choice"]
+        }
+      ]
     },
     "sectionB": {
-      "section_name": "Section B",
-      "questions": [],
-      "aced_questions": []
+      "section_name": "Data Analysis",
+      "questions": [
+        {
+          "id": "q1",
+          "image": "images/statistics1/sectionB/question1.png",
+          "answer": "B",
+          "answer_sheet": "images/statistics1/sectionB/answersheet1.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q2",
+          "image": "images/statistics1/sectionB/question2.png",
+          "answer": "15",
+          "answer_sheet": "images/statistics1/sectionB/answersheet2.png",
+          "tags": ["Fill-in"]
+        },
+        {
+          "id": "q3",
+          "image": "images/statistics1/sectionB/question3.png",
+          "answer": "C",
+          "answer_sheet": "images/statistics1/sectionB/answersheet3.png",
+          "tags": ["Multi-Choice"]
+        }
+      ]
+    },
+    "sectionC": {
+      "section_name": "Interpreting Graphs",
+      "questions": [
+        {
+          "id": "q1",
+          "image": "images/statistics1/sectionC/question1.png",
+          "answer": "D",
+          "answer_sheet": "images/statistics1/sectionC/answersheet1.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q2",
+          "image": "images/statistics1/sectionC/question2.png",
+          "answer": "C",
+          "answer_sheet": "images/statistics1/sectionC/answersheet2.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q3",
+          "image": "images/statistics1/sectionC/question3.png",
+          "answer": "A",
+          "answer_sheet": "images/statistics1/sectionC/answersheet3.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q4",
+          "image": "images/statistics1/sectionC/question4.png",
+          "answer": "C",
+          "answer_sheet": "images/statistics1/sectionC/answersheet4.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q5",
+          "image": "images/statistics1/sectionC/question5.png",
+          "answer": "C",
+          "answer_sheet": "images/statistics1/sectionC/answersheet5.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q6",
+          "image": "images/statistics1/sectionC/question6.png",
+          "answer": "B",
+          "answer_sheet": "images/statistics1/sectionC/answersheet6.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q7",
+          "image": "images/statistics1/sectionC/question7.png",
+          "answer": "0.225",
+          "answer_sheet": "images/statistics1/sectionC/answersheet7.png",
+          "tags": ["Fill-in"]
+        },
+        {
+          "id": "q8",
+          "image": "images/statistics1/sectionC/question8.png",
+          "answer": "2.60",
+          "answer_sheet": "images/statistics1/sectionC/answersheet8.png",
+          "tags": ["Fill-in"]
+        },
+        {
+          "id": "q9",
+          "image": "images/statistics1/sectionC/question9.png",
+          "answer": "0.27",
+          "answer_sheet": "images/statistics1/sectionC/answersheet9.png",
+          "tags": ["Fill-in"]
+        },
+        {
+          "id": "q10",
+          "image": "images/statistics1/sectionC/question10.png",
+          "answer": "A",
+          "answer_sheet": "images/statistics1/sectionC/answersheet10.png",
+          "tags": ["Multi-Choice"]
+        },
+        {
+          "id": "q11",
+          "image": "images/statistics1/sectionC/question11.png",
+          "answer": "B",
+          "answer_sheet": "images/statistics1/sectionC/answersheet11.png",
+          "tags": ["Multi-Choice"]
+        }
+      ]
     }
   }
 }

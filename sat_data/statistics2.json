@@ -1,0 +1,150 @@
+{
+    "sections": {
+      "sectionA": {
+        "section_name": "Review",
+        "questions": [
+          {
+            "id": "q1",
+            "image": "images/statistics2/sectionA/question1.png",
+            "answer": "B",
+            "answer_sheet": "images/statistics2/sectionA/answersheet1.png",
+            "tags": ["Multi-Choice"]
+          },
+          {
+            "id": "q2",
+            "image": "images/statistics2/sectionA/question2.png",
+            "answer": "B",
+            "answer_sheet": "images/statistics2/sectionA/answersheet2.png",
+            "tags": ["Multi-Choice"]
+          },
+          {
+            "id": "q3",
+            "image": "images/statistics2/sectionA/question3.png",
+            "answer": "C",
+            "answer_sheet": "images/statistics2/sectionA/answersheet3.png",
+            "tags": ["Multi-Choice"]
+          },
+          {
+            "id": "q4",
+            "image": "images/statistics2/sectionA/question4.png",
+            "answer": "C",
+            "answer_sheet": "images/statistics2/sectionA/answersheet4.png",
+            "tags": ["Multi-Choice"]
+          }
+        ]
+      },
+      "sectionB": {
+        "section_name": "Standard Deviation",
+        "questions": [
+          {
+            "id": "q1",
+            "image": "images/statistics2/sectionB/question1.png",
+            "answer": "C",
+            "answer_sheet": "images/statistics2/sectionB/answersheet1.png",
+            "tags": ["Multi-Choice"]
+          },
+          {
+            "id": "q2",
+            "image": "images/statistics2/sectionB/question2.png",
+            "answer": "D",
+            "answer_sheet": "images/statistics2/sectionB/answersheet2.png",
+            "tags": ["Multi-Choice"]
+          },
+          {
+            "id": "q3",
+            "image": "images/statistics2/sectionB/question3.png",
+            "answer": "B",
+            "answer_sheet": "images/statistics2/sectionB/answersheet3.png",
+            "tags": ["Multi-Choice"]
+          }
+        ]
+      },
+      "sectionC": {
+        "section_name": "Probability",
+        "questions": [
+          {
+            "id": "q1",
+            "image": "images/statistics2/sectionC/question1.png",
+            "answer": "B",
+            "answer_sheet": "images/statistics2/sectionC/answersheet1.png",
+            "tags": ["Multi-Choice"]
+          },
+          {
+            "id": "q2",
+            "image": "images/statistics2/sectionC/question2.png",
+            "answer": "B",
+            "answer_sheet": "images/statistics2/sectionC/answersheet2.png",
+            "tags": ["Multi-Choice"]
+          },
+          {
+            "id": "q3",
+            "image": "images/statistics2/sectionC/question3.png",
+            "answer": "B",
+            "answer_sheet": "images/statistics2/sectionC/answersheet3.png",
+            "tags": ["Multi-Choice"]
+          },
+          {
+            "id": "q4",
+            "image": "images/statistics2/sectionC/question4.png",
+            "answer": "C",
+            "answer_sheet": "images/statistics2/sectionC/answersheet4.png",
+            "tags": ["Multi-Choice"]
+          },
+          {
+            "id": "q5",
+            "image": "images/statistics2/sectionC/question5.png",
+            "answer": "0.6",
+            "answer_sheet": "images/statistics2/sectionC/answersheet5.png",
+            "tags": ["Fill-in"]
+          },
+          {
+            "id": "q6",
+            "image": "images/statistics2/sectionC/question6.png",
+            "answer": "0.625",
+            "answer_sheet": "images/statistics2/sectionC/answersheet6.png",
+            "tags": ["Fill-in"]
+          },
+          {
+            "id": "q7",
+            "image": "images/statistics2/sectionC/question7.png",
+            "answer": "0.444",
+            "answer_sheet": "images/statistics2/sectionC/answersheet7.png",
+            "tags": ["Fill-in"]
+          },
+          {
+            "id": "q8",
+            "image": "images/statistics2/sectionC/question8.png",
+            "answer": "0.222",
+            "answer_sheet": "images/statistics2/sectionC/answersheet8.png",
+            "tags": ["Fill-in"]
+          }
+        ]
+      },
+      "sectionD": {
+        "section_name": "Quality Control",
+        "questions": [
+          {
+            "id": "q1",
+            "image": "images/statistics2/sectionD/question1.png",
+            "answer": "C",
+            "answer_sheet": "images/statistics2/sectionD/answersheet1.png",
+            "tags": ["Multi-Choice"]
+          },
+          {
+            "id": "q2",
+            "image": "images/statistics2/sectionD/question2.png",
+            "answer": "C",
+            "answer_sheet": "images/statistics2/sectionD/answersheet2.png",
+            "tags": ["Multi-Choice"]
+          },
+          {
+            "id": "q3",
+            "image": "images/statistics2/sectionD/question3.png",
+            "answer": "B",
+            "answer_sheet": "images/statistics2/sectionD/answersheet3.png",
+            "tags": ["Multi-Choice"]
+          }
+        ]
+      }
+    }
+  }
