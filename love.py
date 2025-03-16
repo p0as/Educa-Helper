@@ -32,9 +32,9 @@ DATA_DIR = "sat_data"
 
 # List of current subjects
 SUBJECT_PARTS = [
-    'geometry1', 'geometry2', 'geometry3', 'statistics1',
+    'geometry1', 'geometry2', 'geometry3', 'statistics1', 'statistics2',
     'arithmetic1', 'arithmetic2', 'algebra1', 'algebra2',
-    'algebra3', 'algebra4', 'functions1'
+    'algebra3', 'algebra4', 'functions1',
 ]
 
 # Motivational speeches :D
