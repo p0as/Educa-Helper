@@ -1,18 +1,16 @@
-import pygame
-import sys
-import json
-import os
-import random
-import textwrap
-import math
-import requests
-import threading
+import pygame # For graphics
+import sys # Sys operations like exit
+import json # Handle json data and transforms into utf-8 encoding in a function for minimum data
+import os # Filepath operations
+import random # Any rng aspect
+import textwrap # Life saver for text display :pray:
+import math # Anim calculations mainly
 
-# Initialize Pygame and mixer early
+# Pygame mixer
 pygame.mixer.init()
 pygame.init()
 
-# Set application icon
+# App icon
 try:
     icon_image = pygame.image.load("Meshes\\logo.png")
     pygame.display.set_icon(icon_image)
@@ -28,18 +26,18 @@ GRAY = (200, 200, 200)
 BUTTON_COLOR = (50, 50, 150)
 TEXT_COLOR = (255, 255, 255)
 BUTTON_HOVER_COLOR = (80, 80, 180)
+PROGRESS_BAR_COLOR = (0, 0, 255)
 COPYRIGHT_TEXT = "© Educa College Prep - All Rights of 'sat_data' Reserved, more info on readme"
 DATA_DIR = "sat_data"
 
-# List of all subject parts
+# List of current subjects
 SUBJECT_PARTS = [
     'geometry1', 'geometry2', 'geometry3', 'statistics1',
     'arithmetic1', 'arithmetic2', 'algebra1', 'algebra2',
     'algebra3', 'algebra4', 'functions1'
 ]
 
-# Speeches
-# Motivational speeches for correct answers
+# Motivational speeches :D
 MOTIVATIONAL_SPEECHES = [
     "Keep going!",
     "You're unstoppable!",
@@ -73,29 +71,31 @@ MOTIVATIONAL_SPEECHES = [
     "You're the best!"
 ]
 
-# Tag variations for question (sorry i forget alot)
+
 MULTI_CHOICE_VARIATIONS = [
     "multi_choice", "multiple choice", "multi choice", "multichoice", "multiplechoice",
     "mcq", "multiple choice question", "multi-choice", "multiple-choice",
+    "Multi-Choice"  # Add the exact JSON form
 ]
+
 
 FILL_IN_VARIATIONS = [
     "fill_in", "fill in", "fill-ins", "fillins", "fill in blank", "fill-in",
-    "fill in blanks",
+    "fill in blanks", "Fill-in"  # Add the exact JSON form
 ]
 
-# Load icons with fallback (including trophy icon) - Larger size (36x36)
+# Load icons with fallback in 36 x 36
 if not os.path.exists('Meshes/folder_icon.png'):
     print("Warning: Missing folder_icon.png")
-    FOLDER_ICON = pygame.Surface((36, 36))
+    FOLDER_ICON = pygame.Surface((36, 36)) # Placeholder to scale
     FOLDER_ICON.fill(GRAY)
 else:
     FOLDER_ICON = pygame.image.load('Meshes/folder_icon.png')
-    FOLDER_ICON = pygame.transform.scale(FOLDER_ICON, (36, 36))
+    FOLDER_ICON = pygame.transform.scale(FOLDER_ICON, (36, 36)) # Scaling
 
 if not os.path.exists('Meshes/drive.png'):
     print("Warning: Missing drive.png")
-    DRIVE_ICON = pygame.Surface((36, 36))
+    DRIVE_ICON = pygame.Surface((36, 36)) 
     DRIVE_ICON.fill(GRAY)
 else:
     DRIVE_ICON = pygame.image.load('Meshes/drive.png')
@@ -111,8 +111,10 @@ else:
 
 # Volume and animation settings
 VOLUMES = {'click': 1.0, 'correct': 1.0, 'incorrect': 1.0}
-ANIMATION_DURATION = 2000  # 2 seconds in milliseconds
-SUBMIT_COOLDOWN = 1000  # 1 second cooldown in milliseconds
+ANIMATION_DURATION = 2000 
+SUBMIT_COOLDOWN = 5000  # 5 sec in milliseconds
+ #                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ # BEWARE THAT BY CHANGING THESE CONSTANTS THE CODE MAY BREAK
 
 # Sound initialization with error handling
 try:
@@ -146,8 +148,25 @@ def play_safe(sound):
     except Exception as e:
         print(f"Sound play error: {e}")
 
+def draw_wrapped_text(surface, text, x, y, font, color, max_width):
+    wrapped_lines = textwrap.wrap(text, width=max_width // font.size(" ")[0])
+    y_offset = 0
+    for line in wrapped_lines:
+        text_surface = font.render(line, True, color)
+        surface.blit(text_surface, (x, y + y_offset))
+        y_offset += font.get_height()
+
+def draw_loading_screen(screen, message):
+    """Display a loading screen with a custom message."""
+    screen.fill(BLACK)
+    draw_wrapped_text(screen, message, SCREEN_WIDTH // 2 - 300, SCREEN_HEIGHT // 2, font, WHITE, 600)
+    pygame.display.flip()
+
 # Initialize JSON files if missing or invalid
 def initialize_json_files():
+    """Initialize JSON files for each subject part if missing or empty."""
+    if not os.path.exists(DATA_DIR):
+        os.makedirs(DATA_DIR)  # Create directory if it doesn’t exist
     for part in SUBJECT_PARTS:
         filepath = os.path.join(DATA_DIR, f"{part}.json")
         if not os.path.exists(filepath) or os.path.getsize(filepath) == 0:
@@ -157,36 +176,11 @@ def initialize_json_files():
                     "sectionB": {"section_name": "Section B", "questions": [], "aced_questions": []}
                 }
             }
+            if part == "arithmetic1":  # Match example JSON structure
+                default_data["sections"]["sectionC"] = {"section_name": "Section C", "questions": [], "aced_questions": []}
             with open(filepath, 'w', encoding='utf-8') as f:
                 json.dump(default_data, f, indent=2)
                 print(f"Initialized {filepath} with default data")
-
-# Download JSON files in a separate thread
-def download_json_files():
-    global current_download, download_complete
-    for part in SUBJECT_PARTS:
-        url = f"http://example.com/sat_data/{part}.json"  # Replace with your actual URLs
-        filepath = os.path.join(DATA_DIR, f"{part}.json")
-        current_download = f"{part}.json"
-        try:
-            response = requests.get(url, timeout=10)
-            if response.status_code == 200:
-                with open(filepath, 'w', encoding='utf-8') as f:
-                    f.write(response.text)
-            else:
-                print(f"Failed to download {url}: Status code {response.status_code}")
-        except Exception as e:
-            print(f"Error downloading {url}: {e}")
-    download_complete = True
-
-# Utility functions
-def draw_wrapped_text(surface, text, x, y, font, color, max_width):
-    wrapped_lines = textwrap.wrap(text, width=max_width // font.size(" ")[0])
-    y_offset = 0
-    for line in wrapped_lines:
-        text_surface = font.render(line, True, color)
-        surface.blit(text_surface, (x, y + y_offset))
-        y_offset += font.get_height()
 
 def load_json(filepath):
     try:
@@ -196,7 +190,10 @@ def load_json(filepath):
                 print(f"{filepath} is empty or minimal, returning default")
                 return {"sections": {}}
             data = json.loads(content)
-            print(f"Loaded {filepath}: {data}")
+            # Print the "Loaded" message first
+            print(f"Loaded {filepath}:")
+            # Print the full JSON data with indentation
+            print(json.dumps(data, indent=2))
             return data
     except json.JSONDecodeError as e:
         print(f"Error loading {filepath}: Invalid JSON format - {str(e)}")
@@ -204,6 +201,85 @@ def load_json(filepath):
     except FileNotFoundError:
         print(f"Warning: {filepath} not found. Returning default structure.")
         return {"sections": {}}
+
+class InputBox:
+    def __init__(self, x, y, width, height):
+        self.rect = pygame.Rect(x, y, width, height)
+        self.text = ""
+        self.active = False
+        self.parent = None
+        self.max_width = width - 10  # Account for padding
+
+    def handle_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            self.active = self.rect.collidepoint(event.pos)
+        if event.type == pygame.KEYDOWN and self.active:
+            if event.key == pygame.K_RETURN:
+                if self.parent:
+                    self.parent.check_answer()
+            elif event.key == pygame.K_BACKSPACE:
+                self.text = self.text[:-1]
+            else:
+                # Only add character if it fits
+                temp_text = self.text + event.unicode
+                if font.size(temp_text)[0] <= self.max_width:
+                    self.text = temp_text
+
+    def draw(self, screen):
+        border_color = (0, 0, 255) if self.active else (0, 0, 0)  
+        pygame.draw.rect(screen, (255, 255, 255), self.rect)  
+        pygame.draw.rect(screen, border_color, self.rect, 2)
+        text_surf = font.render(self.text, True, (0, 0, 0)) 
+        if text_surf.get_width() > self.max_width:
+            for i in range(len(self.text), -1, -1):
+                clipped_text = self.text[:i]
+                if font.size(clipped_text)[0] <= self.max_width:
+                    text_surf = font.render(clipped_text, True, (0, 0, 0))
+                    break
+        screen.blit(text_surf, (self.rect.x + 5, self.rect.y + 5))
+
+# Utility functions
+class ProgressBar:
+    def __init__(self, x, y, width, height):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.current_progress = 0  
+        self.target_progress = 0   
+        self.start_time = None
+        self.animation_duration = 1000 
+        self.animation_active = False
+
+    def start_animation(self, target_progress):
+        """Start animating to the target progress."""
+        self.start_time = pygame.time.get_ticks()
+        self.target_progress = max(0, min(1, target_progress))  # Clamp between 0 and 1
+        self.animation_active = True
+
+    def update(self, progress_percentage=None):
+        """Update the progress bar animation."""
+        if progress_percentage is not None and not self.animation_active:
+            self.start_animation(progress_percentage)
+        if self.animation_active:
+            current_time = pygame.time.get_ticks()
+            elapsed = current_time - self.start_time
+            if elapsed < self.animation_duration:
+                t = elapsed / self.animation_duration
+                # Use smoothstep for a natural animation curve
+                t = t * t * (3 - 2 * t)
+                self.current_progress = self.current_progress + (self.target_progress - self.current_progress) * t
+            else:
+                self.current_progress = self.target_progress
+                self.animation_active = False
+
+    def draw(self, surface):
+        """Draw the progress bar."""
+        # Background
+        pygame.draw.rect(surface, GRAY, (self.x, self.y, self.width, self.height))
+        # Animated fill
+        fill_width = int(self.width * self.current_progress)
+        pygame.draw.rect(surface, PROGRESS_BAR_COLOR, (self.x, self.y, fill_width, self.height))
 
 # Answer Animation class
 class AnswerAnimation:
@@ -242,8 +318,8 @@ class SolutionSheet:
         self.real_answer_sheet = None
         self.preview_width = 290
         self.preview_height = 290
-        self.full_width = 500  # Fixed width for the opened sheet
-        self.full_height = SCREEN_HEIGHT - 100  # Viewport height when opened
+        self.full_width = 500  
+        self.full_height = SCREEN_HEIGHT - 100 
         self.preview_x = SCREEN_WIDTH - self.preview_width - 90
         self.preview_y = 200
         self.x = self.preview_x
@@ -324,7 +400,9 @@ class SolutionSheet:
             play_safe(SOUND_PAPER_FOLD)
 
     def handle_event(self, event, quiz_screen):
-        # Restrict to left mouse button only (event.button == 1)
+        if event is None:  # Prevent NoneType errors
+            return
+    # Restrict to left mouse button only (event.button == 1)
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.preview_active:
             mouse_pos = event.pos
             current_rect = pygame.Rect(self.x, self.y, self.width, self.height)
@@ -335,7 +413,7 @@ class SolutionSheet:
                 if quiz_screen.state.current_question and "answer_sheet" in quiz_screen.state.current_question:
                     self.real_answer_sheet = quiz_screen.state.current_question['answer_sheet']
         elif event.type == pygame.MOUSEWHEEL and self.opened:
-            # Scroll wheel only adjusts scroll position
+        # Scroll wheel only adjusts scroll position
             scroll_amount = -event.y * 30
             self.scroll_y = max(0, min(self.scroll_y + scroll_amount, max(0, self.image_height - self.height)))
 
@@ -370,68 +448,65 @@ class SolutionSheet:
             answer_sheet_text = large_font.render("Answer Sheet", True, BLACK)
             screen.blit(answer_sheet_text, (current_rect.x, current_rect.bottom + 10))
 
-# Button class with icon support
+
+# Button class with icon support and dynamic width adjustment
 class Button:
     def __init__(self, x, y, width, height, text, callback, disabled=False, icon=None, parent=None):
-        self.rect = pygame.Rect(x, y, width, height)
+        self.x = x
+        self.y = y
+        self.min_width = width
+        self.min_height = height
         self.text = text
         self.callback = callback
-        self.hovered = False
         self.disabled = disabled
         self.icon = icon
-        self.parent = parent  # Store the parent (e.g., QuizScreen or GameState)
-
-    def draw(self, surface):
-        color = GRAY if self.disabled else (BUTTON_HOVER_COLOR if self.hovered else BUTTON_COLOR)
-        pygame.draw.rect(surface, color, self.rect)
+        self.parent = parent
+        self.hovered = False
+        
+        # Calculate width with proper padding
         if self.icon:
-            icon_x = self.rect.x + 10
-            icon_y = self.rect.centery - self.icon.get_height() // 2
-            surface.blit(self.icon, (icon_x, icon_y))
-            text_surf = font.render(self.text, True, TEXT_COLOR)
-            text_x = icon_x + self.icon.get_width() + 10
-            text_y = self.rect.centery - text_surf.get_height() // 2
-            surface.blit(text_surf, (text_x, text_y))
+            wrap_width = (self.min_width - 56 - 20) // font.size(" ")[0]  # 56 = 10 + 36 + 10, 20 = right padding
         else:
-            text_surf = font.render(self.text, True, TEXT_COLOR)
-            text_rect = text_surf.get_rect(center=self.rect.center)
-            surface.blit(text_surf, text_rect)
+            wrap_width = (self.min_width - 20) // font.size(" ")[0]  # 10 left + 10 right padding
+        self.lines = textwrap.wrap(text, width=wrap_width)
+        text_width = max([font.size(line)[0] for line in self.lines], default=0)
+        if self.icon:
+            self.width = max(self.min_width, 56 + text_width + 20)  # Icon space + text + right padding
+        else:
+            self.width = max(self.min_width, 10 + text_width + 10)  # Left + text + right padding
+        self.height = max(self.min_height, len(self.lines) * font.get_height() + 20)
+        self.rect = pygame.Rect(x, y, self.width, self.height)
 
     def update_hover(self, mouse_pos):
-        self.hovered = not self.disabled and self.rect.collidepoint(mouse_pos)
-
-    def handle_event(self, event):
-        if not self.disabled and event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.hovered:
-            if self.text == "Submit" and hasattr(self, 'parent') and not self.parent.state.can_submit():
-                return  # Do nothing (no sound, no callback) if on cooldown
-            play_safe(SOUND_BUTTON_CLICK)
-            self.callback()
-
-# InputBox class
-class InputBox:
-    def __init__(self, x, y, width, height):
-        self.rect = pygame.Rect(x, y, width, height)
-        self.text = ""
-        self.active = False
-        self.parent = None
-
-    def handle_event(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            self.active = self.rect.collidepoint(event.pos)
-        if event.type == pygame.KEYDOWN and self.active:
-            if event.key == pygame.K_RETURN:
-                if self.parent:
-                    self.parent.check_answer()
-            elif event.key == pygame.K_BACKSPACE:
-                self.text = self.text[:-1]
-            else:
-                self.text += event.unicode
+        """Update the hover state based on mouse position."""
+        self.hovered = self.rect.collidepoint(mouse_pos)
 
     def draw(self, screen):
-        border_color = (0, 0, 255) if self.active else BLACK  # Blue when active, black otherwise
-        pygame.draw.rect(screen, border_color, self.rect, 2)
-        text_surf = font.render(self.text, True, BLACK)
-        screen.blit(text_surf, (self.rect.x + 5, self.rect.y + 5))
+        """Render the button on the screen."""
+        if self.disabled:
+            color = GRAY
+        elif self.hovered:
+            color = BUTTON_HOVER_COLOR
+        else:
+            color = BUTTON_COLOR
+        pygame.draw.rect(screen, color, self.rect)
+        # Draw icon if present
+        if self.icon:
+            screen.blit(self.icon, (self.x + 10, self.y + (self.height - self.icon.get_height()) // 2))
+        # Draw text
+        text_x = self.x + (56 if self.icon else 10)
+        text_y = self.y + 10
+        for line in self.lines:
+            text_surf = font.render(line, True, TEXT_COLOR)
+            screen.blit(text_surf, (text_x, text_y))
+            text_y += font.get_height()
+
+    def handle_event(self, event):
+        """Handle mouse events for the button."""
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            if self.rect.collidepoint(event.pos) and not self.disabled:
+                self.callback()
+                play_safe(SOUND_BUTTON_CLICK)
 
 # Slider class for aced questions navigation
 class Slider:
@@ -471,10 +546,8 @@ class Slider:
 # GameState class with integrated load_questions and save_questions
 class GameState:
     def __init__(self):
-        self.current_screen = "loading"
-        self.all_data = {}  # Store all loaded JSON data
-        self.loading_messages = []  # List of loading feedback messages
-        self.loading_index = 0  # Track current message being displayed
+        self.current_screen = "main_menu"
+        self.all_data = {}
         self.current_part = None
         self.current_sections = []
         self.current_session = {'remaining': [], 'total_questions': 0, 'aced_in_session': set(), 'solved': set()}
@@ -484,112 +557,72 @@ class GameState:
         self.randomize = False
         self.last_submit_time = 0
         self.quiz_start_time = 0
-        self.reset_timer_confirmation = False
         self.current_question_index = 0
-        self.aced_questions = {part: {'sectionA': [], 'sectionB': []} for part in SUBJECT_PARTS}
-        self.load_aced_questions()
-        self.show_image_popup = False
+        self.aced_questions = {part: {} for part in SUBJECT_PARTS}
+        self.main_menu_confirmation = False
+        self.reset_timer_confirmation = False
 
     def can_submit(self):
-        current_time = pygame.time.get_ticks()
-        return current_time - self.last_submit_time >= SUBMIT_COOLDOWN
-
-    def get_quiz_time(self):
-        if self.current_screen == "quiz" and self.quiz_start_time > 0:
-            return pygame.time.get_ticks() - self.quiz_start_time
-        return 0
-
-    def reset_timer(self):
-        self.quiz_start_time = pygame.time.get_ticks()
-        self.reset_timer_confirmation = False
+        return pygame.time.get_ticks() - self.last_submit_time >= SUBMIT_COOLDOWN
 
     def start_new_session(self, subject_part, sections):
-        print(f"Starting session for {subject_part} with sections: {sections}")
         self.current_part = subject_part
         self.current_sections = sections
         self.current_session = {'remaining': [], 'total_questions': 0, 'aced_in_session': set(), 'solved': set()}
-        self.load_aced_questions()
         all_questions = []
         for section in sections:
-            questions = self.load_questions(subject_part, section)
-            # Only exclude questions aced in the current section
-            aced_ids = {aq['id'] for aq in self.aced_questions[subject_part][section]}
-            section_questions = [q for q in questions if q.get('id') not in aced_ids]
+            questions = self.load_questions(subject_part, section)  # Load dynamically here
+            aced_ids = {aq['id'] for aq in self.aced_questions[subject_part].get(section, [])}
+            section_questions = [q for q in questions if q['id'] not in aced_ids]
             all_questions.extend(section_questions)
-
         if not all_questions:
-            print("No questions found, returning to main menu")
             self.current_screen = "main_menu"
             return
-
-        self.current_session['remaining'] = all_questions  # Already filtered per section
-        self.current_session['aced_in_session'] = set()
-        self.current_session['solved'] = set()
-
-        if not self.current_session['remaining']:
-            print("All questions aced, showing completion message")
-            self.show_completion_message()
-            return
-
+        self.current_session['remaining'] = all_questions
         if self.randomize:
             random.shuffle(self.current_session['remaining'])
-
-        self.current_session['total_questions'] = len(self.current_session['remaining'])
+        self.current_session['total_questions'] = len(self.current_session['remaining']) + sum(len(self.aced_questions[subject_part].get(section, [])) for section in sections)
         self.current_screen = "quiz"
         self.current_question_index = 0
-        self.current_question = self.current_session['remaining'][self.current_question_index]
+        self.current_question = self.current_session['remaining'][0] if self.current_session['remaining'] else None
         self.quiz_start_time = pygame.time.get_ticks()
         self.last_submit_time = 0
-        self.reset_timer_confirmation = False
         self.tries_left = 3
-        print(f"Session started with {len(self.current_session['remaining'])} questions")
+        # Calculate initial progress and animate
+        initial_aced = self.current_session['total_questions'] - len(self.current_session['remaining'])
+        progress = initial_aced / self.current_session['total_questions'] if self.current_session['total_questions'] > 0 else 0
+        self.quiz.progress_bar.current_progress = 0  # Reset to 0
+        self.quiz.progress_bar.start_animation(progress)  # Animate to initial progress
 
     def ace_question(self):
-        if self.current_question and self.current_part and self.current_sections:
-            question_id = self.current_question.get('id')
-            if not question_id:
-                print("Error: Current question has no 'id' field")
-                return
-
-            already_aced = any(q['id'] == question_id for section in self.aced_questions[self.current_part]
-                              for q in self.aced_questions[self.current_part][section])
-            if already_aced:
-                print(f"Question {question_id} already aced, skipping")
-                return
-
-            print(f"Acing question: {self.current_question}")
-            for section in self.current_sections:
-                questions = self.load_questions(self.current_part, section)
-                if any(q['id'] == question_id for q in questions):
-                    self.save_aced_question(self.current_part, section, self.current_question.copy())
-                    self.current_session['aced_in_session'].add(question_id)
-                    break
-
-            if question_id in [q['id'] for q in self.current_session['remaining']]:
-                self.current_session['remaining'] = [q for q in self.current_session['remaining']
-                                                    if q['id'] != question_id]
+        print(f"Acing question {self.current_question['id']}")  # Debug with ID
+        if not self.current_question or not self.current_session['remaining']:
+            return
+        question_id = self.current_question['id']
+        if question_id in self.current_session['aced_in_session']:
+            print(f"Question {question_id} already aced in this session, skipping")
+            return
+        for section in self.current_sections:
+            questions = self.load_questions(self.current_part, section)
+            if any(q['id'] == question_id for q in questions):
+                self.save_aced_question(self.current_part, section, self.current_question.copy())
+                self.current_session['remaining'] = [q for q in self.current_session['remaining'] if q['id'] != question_id]
+                self.current_session['aced_in_session'].add(question_id)
+                # Update progress bar with animation
+                initial_total = self.current_session['total_questions']
+                current_remaining = len(self.current_session['remaining'])
+                aced_count = initial_total - current_remaining
+                progress = aced_count / initial_total if initial_total > 0 else 0
+                self.quiz.progress_bar.start_animation(progress)
                 if not self.current_session['remaining']:
                     self.show_completion_message()
-                    return
-
-                if self.current_question_index >= len(self.current_session['remaining']):
-                    self.current_question_index = 0
-                self.current_question = self.current_session['remaining'][self.current_question_index]
-
-            if hasattr(self, 'quiz') and self.quiz:
-                self.quiz.ace_button = None
-                self.quiz.update_button_states()
-
-            all_aced = True
-            for section in self.current_sections:
-                section_questions = self.load_questions(self.current_part, section)
-                if not all(q['id'] in {aq['id'] for aq in self.aced_questions[self.current_part][section]}
-                          for q in section_questions):
-                    all_aced = False
-                    break
-
-            if all_aced:
-                self.show_completion_message()
+                    self.current_screen = "main_menu"
+                else:
+                    self.current_question_index = min(self.current_question_index, len(self.current_session['remaining']) - 1)
+                    self.current_question = self.current_session['remaining'][self.current_question_index] if self.current_session['remaining'] else None
+                self.quiz.ace_button = None  # Clear ace button after acing
+                self.tries_left = 3  # Reset tries after acing
+                break
 
     def show_completion_message(self):
         screen.fill(WHITE)
@@ -655,6 +688,13 @@ class GameState:
         filepath = os.path.join(DATA_DIR, filename)
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2)  # Save to file for persistence
+    def get_quiz_time(self):
+        return pygame.time.get_ticks() - self.quiz_start_time
+
+    def reset_timer(self):
+        self.quiz_start_time = pygame.time.get_ticks()
+        self.last_submit_time = 0
+        play_safe(SOUND_BUTTON_CLICK)
 
 # QuizScreen class
 class QuizScreen:
@@ -664,11 +704,12 @@ class QuizScreen:
         self.answer_box.parent = self
         self.current_question_index = 0
         self.image_rect = pygame.Rect(30, 100, 500, 500)
+        self.progress_bar = ProgressBar(100, 20, 200, 20)
         self.buttons = [
             Button(50, 610, 120, 50, "Back", self.previous_question, disabled=True, parent=self),
             Button(1000, 600, 120, 50, "Next", self.next_question, disabled=True, parent=self),
             Button(1150, 600, 120, 50, "Skip", self.skip_question, parent=self),
-            Button(1000, 660, 150, 50, "Main Menu", lambda: setattr(self.state, 'current_screen', 'main_menu'), parent=self),
+            Button(1000, 660, 150, 50, "Main Menu", self.show_main_menu_confirmation, parent=self),  # Updated
             Button(620, 570, 150, 50, "Submit", self.check_answer, parent=self),
             Button(SCREEN_WIDTH - 222, 60, 200, 50, "Toggle Clock", self.toggle_clock, parent=self),
             Button(SCREEN_WIDTH - 222, 120, 200, 50, "Reset Timer", self.show_reset_confirmation, parent=self)
@@ -692,6 +733,18 @@ class QuizScreen:
             self.state.tries_left = 3
             self.answer_box.text = ""
             self.update_button_states()
+    def show_main_menu_confirmation(self):
+        self.state.main_menu_confirmation = True
+
+    def confirm_main_menu(self, confirm):
+        if confirm:
+            self.state.current_screen = "main_menu"
+            self.state.current_question = None
+            self.state.current_session.clear()
+            self.current_question_index = 0
+            self.ace_button = None
+            self.answer_box.text = ""
+        self.state.main_menu_confirmation = False
 
     def next_question(self):
         if self.current_question_index < len(self.state.current_session['remaining']) - 1 and self.state.current_session['remaining']:
@@ -727,7 +780,7 @@ class QuizScreen:
                 return
                 
             current_time = pygame.time.get_ticks()
-            if not self.state.can_submit():
+            if current_time - self.state.last_submit_time < SUBMIT_COOLDOWN:
                 self.animation.start(False)
                 self.animation.message = "Please wait before submitting again"
                 play_safe(SOUND_INCORRECT)
@@ -736,8 +789,11 @@ class QuizScreen:
             user_answer = self.answer_box.text.lower().strip()
             print(f"check_answer called with user_answer: '{user_answer}'")  # Debug log
             correct_answer = self.state.current_question['answer'].lower().strip()
-            is_multi_choice = any(variation in (self.state.current_question.get("tags", []) or []) for variation in MULTI_CHOICE_VARIATIONS)
-            is_fill_in = any(variation in (self.state.current_question.get("tags", []) or []) for variation in FILL_IN_VARIATIONS)
+            
+            # Normalize tags for comparison
+            tags = [tag.lower().replace('-', '_') for tag in self.state.current_question.get("tags", [])]
+            is_multi_choice = any(variation.replace('-', '_') in tags for variation in MULTI_CHOICE_VARIATIONS)
+            is_fill_in = any(variation.replace('-', '_') in tags for variation in FILL_IN_VARIATIONS)
 
             if not user_answer:
                 self.animation.start(False)
@@ -745,7 +801,6 @@ class QuizScreen:
                 play_safe(SOUND_INCORRECT)
                 self.answer_box.text = ""
                 self.ace_button = None
-                self.state.last_submit_time = current_time
                 self.update_button_states()
                 return
 
@@ -760,8 +815,7 @@ class QuizScreen:
                         play_safe(SOUND_CORRECT)
                         self.state.tries_left = 3
                         question_id = self.state.current_question.get('id')
-                        already_aced = any(q['id'] == question_id for section in self.state.aced_questions[self.state.current_part]
-                                           for q in self.state.aced_questions[self.state.current_part][section])
+                        already_aced = question_id in self.state.current_session['aced_in_session']
                         if not already_aced:
                             self.ace_button = Button(620, 630, 150, 40, "Ace Question", self.state.ace_question, parent=self)
                         else:
@@ -781,7 +835,6 @@ class QuizScreen:
                     play_safe(SOUND_INCORRECT)
                     self.answer_box.text = ""
                     self.ace_button = None
-                    self.state.last_submit_time = current_time
                     self.update_button_states()
                     return
                 elif any(char.isdigit() for char in user_answer) or '.' in user_answer or ',' in user_answer:
@@ -790,7 +843,6 @@ class QuizScreen:
                     play_safe(SOUND_INCORRECT)
                     self.answer_box.text = ""
                     self.ace_button = None
-                    self.state.last_submit_time = current_time
                     self.update_button_states()
                     return
                 else:
@@ -801,8 +853,7 @@ class QuizScreen:
                         play_safe(SOUND_CORRECT)
                         self.state.tries_left = 3
                         question_id = self.state.current_question.get('id')
-                        already_aced = any(q['id'] == question_id for section in self.state.aced_questions[self.state.current_part]
-                                           for q in self.state.aced_questions[self.state.current_part][section])
+                        already_aced = question_id in self.state.current_session['aced_in_session']
                         if not already_aced:
                             self.ace_button = Button(620, 630, 150, 40, "Ace Question", self.state.ace_question, parent=self)
                         else:
@@ -829,6 +880,8 @@ class QuizScreen:
                         if real_answer_sheet:
                             self.solution_sheet.start_preview("Meshes/answer_sheet.png", real_answer_sheet)
                     self.state.tries_left -= 1
+                    self.update_button_states()
+                    return
                 elif any(char.isdigit() for char in user_answer) or '.' in user_answer or ',' in user_answer:
                     self.animation.start(False)
                     self.animation.message = "We are in fill-ins, not multi-choice!"
@@ -840,6 +893,8 @@ class QuizScreen:
                         if real_answer_sheet:
                             self.solution_sheet.start_preview("Meshes/answer_sheet.png", real_answer_sheet)
                     self.state.tries_left -= 1
+                    self.update_button_states()
+                    return
                 elif correct:
                     motivational = random.choice(MOTIVATIONAL_SPEECHES)
                     self.animation.start(True)
@@ -847,8 +902,7 @@ class QuizScreen:
                     play_safe(SOUND_CORRECT)
                     self.state.tries_left = 3
                     question_id = self.state.current_question.get('id')
-                    already_aced = any(q['id'] == question_id for section in self.state.aced_questions[self.state.current_part]
-                                       for q in self.state.aced_questions[self.state.current_part][section])
+                    already_aced = question_id in self.state.current_session['aced_in_session']
                     if not already_aced:
                         self.ace_button = Button(620, 630, 150, 40, "Ace Question", self.state.ace_question, parent=self)
                     else:
@@ -868,8 +922,8 @@ class QuizScreen:
                             self.solution_sheet.start_preview("Meshes/answer_sheet.png", real_answer_sheet)
 
             else:
-                # Default case for untagged questions
-                print("Question type not recognized, processing as default")
+                # Default case for untagged or unrecognized questions
+                print(f"Question type not recognized, processing as default. Tags: {self.state.current_question.get('tags', [])}")
                 if correct:
                     motivational = random.choice(MOTIVATIONAL_SPEECHES)
                     self.animation.start(True)
@@ -877,8 +931,7 @@ class QuizScreen:
                     play_safe(SOUND_CORRECT)
                     self.state.tries_left = 3
                     question_id = self.state.current_question.get('id')
-                    already_aced = any(q['id'] == question_id for section in self.state.aced_questions[self.state.current_part]
-                                       for q in self.state.aced_questions[self.state.current_part][section])
+                    already_aced = question_id in self.state.current_session['aced_in_session']
                     if not already_aced:
                         self.ace_button = Button(620, 630, 150, 40, "Ace Question", self.state.ace_question, parent=self)
                     else:
@@ -896,7 +949,7 @@ class QuizScreen:
                             self.solution_sheet.start_preview("Meshes/answer_sheet.png", real_answer_sheet)
                 self.answer_box.text = ""
 
-            self.state.last_submit_time = current_time
+            self.state.last_submit_time = current_time  # Only set for valid submissions
             self.update_button_states()
         except Exception as e:
             print(f"Error in check_answer: {e}")
@@ -904,6 +957,7 @@ class QuizScreen:
     def update_button_states(self):
         remaining = self.state.current_session['remaining']
         total_questions = len(remaining)
+        current_time = pygame.time.get_ticks()
         for btn in self.buttons:
             if btn.text == "Back":
                 btn.disabled = self.current_question_index <= 0 or not remaining
@@ -913,7 +967,7 @@ class QuizScreen:
             elif btn.text == "Skip":
                 btn.disabled = not remaining
             elif btn.text == "Submit":
-                btn.disabled = not self.state.current_question or not self.state.can_submit()  # Disable during cooldown
+                btn.disabled = not self.state.current_question or (current_time - self.state.last_submit_time < SUBMIT_COOLDOWN)
         if self.ace_button:
             question_id = self.state.current_question.get('id')
             already_aced = any(q['id'] == question_id for section in self.state.aced_questions[self.state.current_part]
@@ -933,127 +987,122 @@ class QuizScreen:
         if confirm:
             self.state.reset_timer()
         self.state.reset_timer_confirmation = False
-
-    def handle_image_click(self, pos):
-        pass
             
     def draw(self, screen):
+        if self.state.current_screen != "quiz":
+            return
+
         screen.fill(WHITE)
         if not self.state.current_session['remaining']:
             self.state.current_screen = "main_menu"
             return
 
-        if self.state.current_question:
-            self.update_button_states()  # Update button states every frame
+        # Draw section name with wrapping
+        section_text = self.state.current_question.get("section_name", "Unknown Section")
+        draw_wrapped_text(screen, f"Section: {section_text}", 30, 50, font, BLACK, 500)
 
-            if "tags" in self.state.current_question:
-                tags_text = ", ".join(self.state.current_question["tags"])
-                tags_surf = font.render(f"Tags: {tags_text}", True, BLACK)
-                screen.blit(tags_surf, (30 + (500 - tags_surf.get_width()) // 2, 70))
+        # Draw tags with wrapping
+        if "tags" in self.state.current_question:
+            tags_text = ", ".join(self.state.current_question["tags"])
+            draw_wrapped_text(screen, f"Tags: {tags_text}", 30, 77, font, BLACK, 500)
 
-            section_text = font.render(self.state.current_question.get("section_name", ""), True, BLACK)
-            screen.blit(section_text, (30 + (500 - section_text.get_width()) // 2, 50))
-
-            try:
-                img_path = self.state.current_question['image']
-                img = pygame.image.load(img_path).convert_alpha()
-                orig_width, orig_height = img.get_size()
-
-                # Handle image scaling based on original size
-                if orig_width <= 500:
-                    # Keep original size if width <= 500
-                    scaled_width = orig_width
-                    scaled_height = orig_height
-                    self.question_image = img
-                else:
-                    # Scale to width=500 if original width > 500
-                    scale_factor = 500 / orig_width
-                    scaled_width = 500
-                    scaled_height = int(orig_height * scale_factor)
-                    self.question_image = pygame.transform.scale(img, (scaled_width, scaled_height))
-
-                self.question_image_height = scaled_height
-
-                # Display image with scrolling if necessary
-                if scaled_height > 500:
-                    src_y = self.question_scroll_y
-                    src_height = min(500, scaled_height - src_y)
-                    src_rect = pygame.Rect(0, src_y, scaled_width, src_height)
-                    x = 30 + (500 - scaled_width) // 2  # Center horizontally
-                    screen.blit(self.question_image, (x, 100), src_rect)
-                    # Add scroll message
-                    scroll_text = font.render("Scroll to view the full image", True, GRAY)
-                    screen.blit(scroll_text, (550, 150))
-                else:
-                    x = 30 + (500 - scaled_width) // 2
-                    y = 100 + (500 - scaled_height) // 2  # Center vertically
-                    screen.blit(self.question_image, (x, y))
-                    self.question_scroll_y = 0  # Reset scroll if not needed
-
-            except Exception as e:
-                print(f"Error loading image: {e}")
-                img = pygame.Surface((500, 500))
-                img.fill(GRAY)
-                img.blit(font.render("Missing Image", True, BLACK), (10, 10))
-                screen.blit(img, (30, 100))
+        # Image handling
+        try:
+            img_path = self.state.current_question['image']
+            img = pygame.image.load(img_path).convert_alpha()
+            orig_width, orig_height = img.get_size()
+            if orig_width <= 500:
+                scaled_width = orig_width
+                scaled_height = orig_height
+                self.question_image = img
+            else:
+                scale_factor = 500 / orig_width
+                scaled_width = 500
+                scaled_height = int(orig_height * scale_factor)
+                self.question_image = pygame.transform.scale(img, (scaled_width, scaled_height))
+            self.question_image_height = scaled_height
+            if scaled_height > 500:
+                src_y = self.question_scroll_y
+                src_height = min(500, scaled_height - src_y)
+                src_rect = pygame.Rect(0, src_y, scaled_width, src_height)
+                x = 30 + (500 - scaled_width) // 2
+                screen.blit(self.question_image, (x, 100), src_rect)
+                scroll_text = font.render("Scroll to view the full image", True, GRAY)
+                screen.blit(scroll_text, (550, 150))
+            else:
+                x = 30 + (500 - scaled_width) // 2
+                y = 100 + (500 - scaled_height) // 2
+                screen.blit(self.question_image, (x, y))
                 self.question_scroll_y = 0
+        except Exception as e:
+            print(f"Error loading image: {e}")
+            img = pygame.Surface((500, 500))
+            img.fill(GRAY)
+            img.blit(font.render("Missing Image", True, BLACK), (10, 10))
+            screen.blit(img, (30, 100))
+            self.question_scroll_y = 0
 
-            pygame.draw.rect(screen, BLACK, self.image_rect, 2)
+        pygame.draw.rect(screen, BLACK, self.image_rect, 2)
 
-            big_text = font.render("IMAGES OWNED BY EDUCA", True, BLACK)
-            screen.blit(big_text, (90 + (500 - big_text.get_width()) // 2, 610))
+        # Progress bar update and draw
+        initial_total = self.state.current_session['total_questions']
+        current_remaining = len(self.state.current_session['remaining'])
+        aced_count = initial_total - current_remaining
+        progress = aced_count / initial_total if initial_total > 0 else 0
+        self.progress_bar.update()  # Update animation state without forcing a new value
+        self.progress_bar.draw(screen)
 
-            self.answer_box.draw(screen)
+        # Rest of the draw method
+        total_questions = len(self.state.current_session['remaining'])
+        current_display = self.current_question_index + 1
+        progress_text = font.render(f"{current_display}/{total_questions}", True, BLACK)
+        screen.blit(progress_text, (20, 20))
 
-            for btn in self.buttons:
-                btn.update_hover(pygame.mouse.get_pos())
-                btn.draw(screen)
-            if self.ace_button:
-                self.ace_button.update_hover(pygame.mouse.get_pos())
-                self.ace_button.draw(screen)
+        self.answer_box.draw(screen)
 
-            total_questions = len(self.state.current_session['remaining'])
-            current_display = self.current_question_index + 1
-            progress_text = font.render(f"{current_display}/{total_questions}", True, BLACK)
-            screen.blit(progress_text, (20, 20))
+        for btn in self.buttons:
+            btn.update_hover(pygame.mouse.get_pos())
+            btn.draw(screen)
+        if self.ace_button:
+            self.ace_button.update_hover(pygame.mouse.get_pos())
+            self.ace_button.draw(screen)
 
-            if self.state.show_answer:
-                answer_text = large_font.render(self.state.current_question['answer'], True, BLACK)
-                screen.blit(answer_text, (SCREEN_WIDTH // 2 - answer_text.get_width() // 2 - 100,
-                                          SCREEN_HEIGHT // 2 - answer_text.get_height() // 2))
+        if self.state.show_answer:
+            answer_text = large_font.render(self.state.current_question['answer'], True, BLACK)
+            screen.blit(answer_text, (SCREEN_WIDTH // 2 - answer_text.get_width() // 2 - 100,
+                                    SCREEN_HEIGHT // 2 - answer_text.get_height() // 2))
 
-            self.animation.update()
-            if pygame.time.get_ticks() - self.animation.start_time < ANIMATION_DURATION + 500:
-                self.animation.draw_animation(screen)
-            self.solution_sheet.draw(screen)
+        self.animation.update()
+        if pygame.time.get_ticks() - self.animation.start_time < ANIMATION_DURATION + 500:
+            self.animation.draw_animation(screen)
+        self.solution_sheet.draw(screen)
 
-            if self.show_clock:
-                quiz_time = self.state.get_quiz_time()
-                minutes = quiz_time // 60000
-                seconds = (quiz_time % 60000) // 1000
-                time_text = font.render(f"Time: {minutes:02d}:{seconds:02d}", True, BLACK)
-                screen.blit(time_text, (SCREEN_WIDTH - 200, 20))
+        if self.show_clock:
+            quiz_time = self.state.get_quiz_time()
+            minutes = quiz_time // 60000
+            seconds = (quiz_time % 60000) // 1000
+            time_text = font.render(f"Time: {minutes:02d}:{seconds:02d}", True, BLACK)
+            screen.blit(time_text, (SCREEN_WIDTH - 200, 20))
 
-            if self.state.reset_timer_confirmation:
-                popup_width, popup_height = 400, 200
-                popup_x, popup_y = (SCREEN_WIDTH - popup_width) // 2, (SCREEN_HEIGHT - popup_height) // 2
-                pygame.draw.rect(screen, GRAY, (popup_x, popup_y, popup_width, popup_height))
-                text = font.render("Are you sure you want to reset the timer?", True, BLACK)
-                screen.blit(text, (popup_x + (popup_width - text.get_width()) // 2, popup_y + 20))
+        if self.state.reset_timer_confirmation:
+            popup_width, popup_height = 400, 200
+            popup_x, popup_y = (SCREEN_WIDTH - popup_width) // 2, (SCREEN_HEIGHT - popup_height) // 2
+            pygame.draw.rect(screen, GRAY, (popup_x, popup_y, popup_width, popup_height))
+            text = font.render("Are you sure you want to reset the timer?", True, BLACK)
+            screen.blit(text, (popup_x + (popup_width - text.get_width()) // 2, popup_y + 20))
 
-                yes_btn = Button(popup_x + 100, popup_y + 120, 80, 40, "Yes", lambda: self.confirm_reset_timer(True))
-                no_btn = Button(popup_x + 220, popup_y + 120, 80, 40, "No", lambda: self.confirm_reset_timer(False))
+            yes_btn = Button(popup_x + 100, popup_y + 120, 80, 40, "Yes", lambda: self.confirm_reset_timer(True))
+            no_btn = Button(popup_x + 220, popup_y + 120, 80, 40, "No", lambda: self.confirm_reset_timer(False))
 
-                yes_btn.update_hover(pygame.mouse.get_pos())
-                no_btn.update_hover(pygame.mouse.get_pos())
-                yes_btn.draw(screen)
-                no_btn.draw(screen)
+            yes_btn.update_hover(pygame.mouse.get_pos())
+            no_btn.update_hover(pygame.mouse.get_pos())
+            yes_btn.draw(screen)
+            no_btn.draw(screen)
 
-                # Handle popup buttons with left-click restriction
-                for event in pygame.event.get():
-                    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                        yes_btn.handle_event(event)
-                        no_btn.handle_event(event)
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    yes_btn.handle_event(event)
+                    no_btn.handle_event(event)
 
         copyright_surf = font.render(COPYRIGHT_TEXT, True, BLACK)
         screen.blit(copyright_surf, (20, SCREEN_HEIGHT - 40))
@@ -1069,6 +1118,11 @@ class AcedViewScreen:
             Button(1150, 570, 120, 50, "Main Menu", lambda: setattr(self.state, 'current_screen', 'main_menu')),
             Button(1150, 630, 120, 50, "Back", lambda: setattr(self.state, 'current_screen', 'aced_section_select'))
         ]
+        # Add a dedicated back button for the no-aced-questions case
+        self.no_aced_back_btn = Button(
+            SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2, 200, 50, "Back",
+            lambda: setattr(self.state, 'current_screen', 'aced_section_select')  # Changed to 'aced_section_select' for consistency
+        )
         self.unace_confirmation = False
         self.selected_question_id = None
         self.slider = None
@@ -1076,7 +1130,79 @@ class AcedViewScreen:
         self.popup_image = None
         self.popup_answer = None
         self.close_button = None
+        self.current_section = None
         self.solution_sheet = SolutionSheet()
+
+    def draw(self, screen):
+        screen.fill(WHITE)
+        aced_list = self.state.aced_questions[self.state.current_part][self.state.current_section]
+
+        if not aced_list:
+            # Use the persistent no_aced_back_btn instead of creating a new one
+            self.no_aced_back_btn.update_hover(pygame.mouse.get_pos())
+            self.no_aced_back_btn.draw(screen)
+            text = font.render("No aced questions in this section", True, BLACK)
+            screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 - 50))
+            return
+
+        # Rest of the existing draw logic for when there are aced questions
+        if not self.slider or self.slider.max_value != max(0, len(aced_list) - 1):
+            self.slider = Slider(100, SCREEN_HEIGHT - 50, SCREEN_WIDTH - 200, 20, 0, max(0, len(aced_list) - 1))
+            self.slider.value = self.current_aced_index
+
+        if self.current_aced_index < len(aced_list):
+            question = aced_list[self.current_aced_index]
+
+            try:
+                img = pygame.image.load(question['image'])
+                img = pygame.transform.scale(img, (500, 500))
+            except Exception:
+                img = pygame.Surface((500, 500))
+                img.fill(GRAY)
+                img.blit(font.render("Missing Image", True, BLACK), (10, 10))
+            screen.blit(img, (30, 100))
+            pygame.draw.rect(screen, BLACK, self.image_rect, 2)
+
+            id_text = large_font.render(f"ID: {question['id']}", True, BLACK)
+            screen.blit(id_text, (30, 30))
+
+            section_text = font.render(question.get("section_name", ""), True, BLACK)
+            screen.blit(section_text, (30 + (500 - section_text.get_width()) // 2, 50))
+
+            for btn in self.buttons:
+                btn.update_hover(pygame.mouse.get_pos())
+                btn.draw(screen)
+
+            if self.unace_confirmation:
+                popup_width, popup_height = 400, 200
+                popup_x, popup_y = (SCREEN_WIDTH - popup_width) // 2, (SCREEN_HEIGHT - popup_height) // 2
+                pygame.draw.rect(screen, GRAY, (popup_x, popup_y, popup_width, popup_height))
+                text = font.render("Confirm unacing this question?", True, BLACK)
+                screen.blit(text, (popup_x + (popup_width - text.get_width()) // 2, popup_y + 20))
+
+                yes_btn = Button(popup_x + 100, popup_y + 120, 80, 40, "Yes", lambda: self.confirm_unace(True))
+                no_btn = Button(popup_x + 220, popup_y + 120, 80, 40, "No", lambda: self.confirm_unace(False))
+
+                yes_btn.update_hover(pygame.mouse.get_pos())
+                no_btn.update_hover(pygame.mouse.get_pos())
+                yes_btn.draw(screen)
+                no_btn.draw(screen)
+
+            if self.slider:
+                self.slider.draw(screen)
+
+            self.solution_sheet.draw(screen)
+
+            if self.show_image_popup and self.popup_image and self.popup_answer:
+                popup_width, popup_height = 700, 500
+                popup_x, popup_y = (SCREEN_WIDTH - popup_width) // 2, (SCREEN_HEIGHT - popup_height) // 2
+                pygame.draw.rect(screen, GRAY, (popup_x, popup_y, popup_width, popup_height))
+                screen.blit(self.popup_image, (popup_x + (popup_width - self.popup_image.get_width()) // 2, popup_y + 20))
+                answer_text = large_font.render(self.popup_answer, True, BLACK)
+                screen.blit(answer_text, (popup_x + (popup_width - answer_text.get_width()) // 2,
+                                         popup_y + 420))
+                self.close_button.update_hover(pygame.mouse.get_pos())
+                self.close_button.draw(screen)
 
     def previous_aced(self):
         aced_list = self.state.aced_questions[self.state.current_part][self.state.current_section]
@@ -1210,10 +1336,6 @@ class AcedViewScreen:
                 yes_btn.draw(screen)
                 no_btn.draw(screen)
 
-                for event in pygame.event.get():
-                    yes_btn.handle_event(event)
-                    no_btn.handle_event(event)
-
             if self.slider:
                 self.slider.draw(screen)
 
@@ -1311,216 +1433,29 @@ class SettingsScreen:
 
 # Screen handler functions
 def handle_main_menu(state, events, mouse_pos):
-    button_width = 200
+    button_width = 250  # Minimum width
     button_height = 50
     spacing = 20
-    total_buttons = 3
-    total_height = total_buttons * button_height + (total_buttons - 1) * spacing
-    start_y = (SCREEN_HEIGHT - total_height) // 2
-
-    buttons = [
-        Button(SCREEN_WIDTH // 2 - button_width // 2, start_y, 250, button_height,
-               "Start", lambda: setattr(state, 'current_screen', 'part_select'), icon=FOLDER_ICON),
-        Button(SCREEN_WIDTH // 2 - button_width // 2, start_y + button_height + spacing, 250, button_height,
-               "Settings", lambda: setattr(state, 'current_screen', 'settings'), icon=DRIVE_ICON),
-        Button(SCREEN_WIDTH // 2 - button_width // 2, start_y + 2 * (button_height + spacing), 250, button_height,
-               "Aced Questions", lambda: setattr(state, 'current_screen', 'aced_select'), icon=TROPHY_ICON)
+    start_y = 200  # Adjusted to give space for title
+    y = start_y
+    buttons = []
+    
+    # Button definitions
+    button_configs = [
+        ("Start", lambda: setattr(state, 'current_screen', 'part_select'), FOLDER_ICON),
+        ("Settings", lambda: setattr(state, 'current_screen', 'settings'), DRIVE_ICON),
+        ("Aced Questions", lambda: setattr(state, 'current_screen', 'aced_select'), TROPHY_ICON)
     ]
-    for btn in buttons:
-        btn.update_hover(mouse_pos)
-        for event in events:
-            btn.handle_event(event)
+    
+    for text, callback, icon in button_configs:
+        btn = Button(0, y, button_width, button_height, text, callback, icon=icon)
+        btn.x = SCREEN_WIDTH // 2 - btn.width // 2
+        btn.rect.x = btn.x
+        buttons.append(btn)
+        y += btn.height + spacing
+    
+    # Draw elements
     title = font.render("SAT Study Helper", True, BLACK)
-    screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 50))
-    for btn in buttons:
-        btn.draw(screen)
-    copyright_surf = font.render(COPYRIGHT_TEXT, True, BLACK)
-    screen.blit(copyright_surf, (20, SCREEN_HEIGHT - 40))
-
-def handle_part_selection(state, events, mouse_pos):
-    screen.fill(WHITE)
-    
-    # Define button and layout parameters
-    button_width = 200
-    button_height = 50
-    spacing = 20  # Used for both vertical and horizontal spacing
-    num_columns = 3
-    total_column_width = num_columns * button_width + (num_columns - 1) * spacing  # 640 pixels
-    left_margin = (SCREEN_WIDTH - total_column_width) // 2  # 320 pixels
-    start_y = 100  # Fixed starting y-position below the title
-    
-    # Calculate buttons per column
-    total_buttons = len(SUBJECT_PARTS)  # 11
-    buttons_per_column = total_buttons // num_columns  # 3
-    remainder = total_buttons % num_columns  # 2
-    
-    buttons = []
-    current_index = 0
-    
-    # Create buttons for each column
-    for col in range(num_columns):
-        x = left_margin + col * (button_width + spacing)  # x = 320, 540, 760
-        # Determine number of buttons in this column
-        if col < remainder:
-            num_buttons = buttons_per_column + 1  # 4 for cols 0 and 1
-        else:
-            num_buttons = buttons_per_column  # 3 for col 2
-        
-        # Slice the SUBJECT_PARTS list for this column
-        column_parts = SUBJECT_PARTS[current_index:current_index + num_buttons]
-        current_index += num_buttons
-        
-        # Create buttons for this column
-        for i, part in enumerate(column_parts):
-            y = start_y + i * (button_height + spacing)  # y increases by 70 per button
-            btn = Button(
-                x, y, button_width, button_height,
-                part.replace('1', ' 1').replace('2', ' 2').replace('3', ' 3').replace('4', ' 4').capitalize(),
-                lambda p=part: setattr(state, 'current_part', p) or setattr(state, 'current_screen', 'section_select'),
-                icon=FOLDER_ICON
-            )
-            buttons.append(btn)
-    
-    # Draw title
-    title = font.render("Select Subject Part", True, BLACK)
-    screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 50))
-    
-    # Update and draw buttons
-    for btn in buttons:
-        btn.update_hover(mouse_pos)
-        for event in events:
-            btn.handle_event(event)
-        btn.draw(screen)
-    
-    # Draw copyright
-    copyright_surf = font.render(COPYRIGHT_TEXT, True, BLACK)
-    screen.blit(copyright_surf, (20, SCREEN_HEIGHT - 40))
-
-def handle_section_selection(state, events, mouse_pos):
-    screen.fill(WHITE)
-    button_width = 200
-    button_height = 50
-    spacing = 20
-    total_buttons = 3
-    total_height = total_buttons * button_height + (total_buttons - 1) * spacing
-    start_y = (SCREEN_HEIGHT - total_height) // 2
-
-    buttons = [
-        Button(SCREEN_WIDTH // 2 - button_width // 2, start_y, button_width, button_height, "Section A",
-               lambda: state.start_new_session(state.current_part, ["sectionA"]), icon=FOLDER_ICON),
-        Button(SCREEN_WIDTH // 2 - button_width // 2, start_y + button_height + spacing, button_width, button_height, "Section B",
-               lambda: state.start_new_session(state.current_part, ["sectionB"]), icon=FOLDER_ICON),
-        Button(SCREEN_WIDTH // 2 - button_width // 2, start_y + 2 * (button_height + spacing), button_width, button_height, "Both",
-               lambda: state.start_new_session(state.current_part, ["sectionA", "sectionB"]), icon=FOLDER_ICON)
-    ]
-    title = font.render(f"Select Sections for {state.current_part.replace('1', ' 1').replace('2', ' 2').replace('3', ' 3').replace('4', ' 4').capitalize()}", True, BLACK)
-    screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 50))
-    for btn in buttons:
-        btn.update_hover(mouse_pos)
-        for event in events:
-            btn.handle_event(event)
-        btn.draw(screen)
-    copyright_surf = font.render(COPYRIGHT_TEXT, True, BLACK)
-    screen.blit(copyright_surf, (20, SCREEN_HEIGHT - 40))
-
-def handle_quiz_screen(state, events, mouse_pos):
-    for btn in state.quiz.buttons:
-        btn.update_hover(mouse_pos)
-        if not state.quiz.solution_sheet.opened:
-            for event in events:
-                btn.handle_event(event)  # Already restricted to left-click in Button class
-    for event in events:
-        if not state.quiz.solution_sheet.opened:
-            state.quiz.answer_box.handle_event(event)  # Already restricted to left-click
-        state.quiz.solution_sheet.handle_event(event, state.quiz)  # Already restricted to left-click
-        # Restrict image clicks and ace button to left mouse button only
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            if not state.quiz.solution_sheet.opened:
-                state.quiz.handle_image_click(event.pos)
-            if state.quiz.ace_button and not state.quiz.solution_sheet.opened:
-                state.quiz.ace_button.handle_event(event)
-        # Add scrolling for question image
-        if event.type == pygame.MOUSEWHEEL:
-            if state.quiz.image_rect.collidepoint(mouse_pos) and state.quiz.question_image_height > 500:
-                scroll_amount = -event.y * 30
-                state.quiz.question_scroll_y = max(0, min(state.quiz.question_scroll_y + scroll_amount, state.quiz.question_image_height - 500))
-    state.quiz.draw(screen)
-
-def handle_aced_select(state, events, mouse_pos):
-    screen.fill(WHITE)
-    
-    # Define button and layout parameters
-    button_width = 200
-    button_height = 50
-    spacing = 20  # Used for both vertical and horizontal spacing
-    num_columns = 3
-    total_column_width = num_columns * button_width + (num_columns - 1) * spacing  # 640 pixels
-    left_margin = (SCREEN_WIDTH - total_column_width) // 2  # 320 pixels
-    start_y = 100  # Fixed starting y-position below the title
-    
-    # Calculate buttons per column
-    total_buttons = len(SUBJECT_PARTS)  # 11
-    buttons_per_column = total_buttons // num_columns  # 3
-    remainder = total_buttons % num_columns  # 2
-    
-    buttons = []
-    current_index = 0
-    
-    # Create buttons for each column
-    for col in range(num_columns):
-        x = left_margin + col * (button_width + spacing)  # x = 320, 540, 760
-        # Determine number of buttons in this column
-        if col < remainder:
-            num_buttons = buttons_per_column + 1  # 4 for cols 0 and 1
-        else:
-            num_buttons = buttons_per_column  # 3 for col 2
-        
-        # Slice the SUBJECT_PARTS list for this column
-        column_parts = SUBJECT_PARTS[current_index:current_index + num_buttons]
-        current_index += num_buttons
-        
-        # Create buttons for this column
-        for i, part in enumerate(column_parts):
-            y = start_y + i * (button_height + spacing)  # y increases by 70 per button
-            btn = Button(
-                x, y, button_width, button_height,
-                part.replace('1', ' 1').replace('2', ' 2').replace('3', ' 3').replace('4', ' 4').capitalize(),
-                lambda p=part: setattr(state, 'current_part', p) or setattr(state, 'current_screen', 'aced_section_select'),
-                icon=FOLDER_ICON  # Add icon for consistency with handle_part_selection
-            )
-            buttons.append(btn)
-    
-    # Draw title
-    title = font.render("Select Subject Part for Aced Questions", True, BLACK)
-    screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 50))
-    
-    # Update and draw buttons
-    for btn in buttons:
-        btn.update_hover(mouse_pos)
-        for event in events:
-            btn.handle_event(event)
-        btn.draw(screen)
-    
-    # Draw copyright
-    copyright_surf = font.render(COPYRIGHT_TEXT, True, BLACK)
-    screen.blit(copyright_surf, (20, SCREEN_HEIGHT - 40))
-
-def handle_aced_section_select(state, events, mouse_pos):
-    screen.fill(WHITE)
-    button_width = 200
-    button_height = 50
-    spacing = 20
-    total_buttons = 2
-    total_height = total_buttons * button_height + (total_buttons - 1) * spacing
-    start_y = (SCREEN_HEIGHT - total_height) // 2
-
-    buttons = [
-        Button(SCREEN_WIDTH // 2 - button_width // 2, start_y, button_width, button_height, "Section A",
-               lambda: setattr(state, 'current_section', 'sectionA') or setattr(state, 'current_screen', 'aced_view')),
-        Button(SCREEN_WIDTH // 2 - button_width // 2, start_y + button_height + spacing, button_width, button_height, "Section B",
-               lambda: setattr(state, 'current_section', 'sectionB') or setattr(state, 'current_screen', 'aced_view'))
-    ]
-    title = font.render(f"Select Section for Aced Questions in {state.current_part.replace('1', ' 1').replace('2', ' 2').replace('3', ' 3').replace('4', ' 4').capitalize()}", True, BLACK)
     screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 50))
     for btn in buttons:
         btn.update_hover(mouse_pos)
@@ -1533,66 +1468,331 @@ def handle_aced_section_select(state, events, mouse_pos):
 def handle_settings_screen(state, events, mouse_pos):
     state.settings.handle_events(events)
     state.settings.draw(screen)
+    
+def handle_part_selection(state, events, mouse_pos):
+    screen.fill(WHITE)
+    button_width = 200  # Minimum width
+    button_height = 50
+    spacing = 20
+    num_columns = 3
+    total_buttons = len(SUBJECT_PARTS)
+    buttons_per_column = (total_buttons + num_columns - 1) // num_columns  # Ceiling division
+    total_columns = (total_buttons + buttons_per_column - 1) // buttons_per_column  # Actual number of columns needed
+    total_width = total_columns * button_width + (total_columns - 1) * spacing
+    left_margin = (SCREEN_WIDTH - total_width) // 2  # Center the entire grid
+    start_y = 100
+
+    buttons = []
+    current_index = 0
+    for col in range(total_columns):
+        x = left_margin + col * (button_width + spacing)
+        num_buttons = min(buttons_per_column, total_buttons - current_index)
+        column_parts = SUBJECT_PARTS[current_index:current_index + num_buttons]
+        current_index += num_buttons
+        for i, part in enumerate(column_parts):
+            y = start_y + i * (button_height + spacing)
+            btn = Button(
+                x, y, button_width, button_height,
+                part.replace('1', ' 1').replace('2', ' 2').replace('3', ' 3').replace('4', ' 4').capitalize(),
+                lambda p=part: setattr(state, 'current_part', p) or setattr(state, 'current_screen', 'section_select'),
+                icon=FOLDER_ICON
+            )
+            buttons.append(btn)
+
+    # Add back button at the bottom, centered
+    back_btn = Button(
+        SCREEN_WIDTH // 2 - button_width // 2, SCREEN_HEIGHT - button_height - 20,
+        button_width, button_height, "Back",
+        lambda: setattr(state, 'current_screen', 'main_menu'),
+        icon=DRIVE_ICON
+    )
+    buttons.append(back_btn)
+
+    title = font.render("Select Subject Part", True, BLACK)
+    screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 50))
+    for btn in buttons:
+        btn.update_hover(mouse_pos)
+        for event in events:
+            btn.handle_event(event)
+        btn.draw(screen)
+    copyright_surf = font.render(COPYRIGHT_TEXT, True, BLACK)
+    screen.blit(copyright_surf, (20, SCREEN_HEIGHT - 40))
+
+def handle_aced_section_select(state, events, mouse_pos):
+    screen.fill(WHITE)
+    button_width = 320  # Increased from 300
+    button_height = 50
+    spacing = 20
+    sections = state.all_data[state.current_part].get("sections", {})
+    start_y = 100
+    y = start_y
+    buttons = []
+    
+    for section_key, section_data in sections.items():
+        section_name = section_data.get("section_name", section_key.capitalize())
+        aced_count = len(state.aced_questions[state.current_part].get(section_key, []))
+        btn_text = f"{section_name} ({aced_count} aced)"
+        btn = Button(
+            0, y, button_width, button_height,
+            btn_text,
+            lambda sk=section_key: setattr(state, 'current_section', sk) or setattr(state, 'current_screen', 'aced_view'),
+            icon=FOLDER_ICON
+        )
+        btn.x = SCREEN_WIDTH // 2 - btn.width // 2
+        btn.rect.x = btn.x
+        buttons.append(btn)
+        y += btn.height + spacing
+    
+    back_btn = Button(
+        0, y, button_width, button_height,
+        "Back",
+        lambda: setattr(state, 'current_screen', 'aced_select'),
+        icon=DRIVE_ICON
+    )
+    back_btn.x = SCREEN_WIDTH // 2 - back_btn.width // 2
+    back_btn.rect.x = back_btn.x
+    buttons.append(back_btn)
+    
+    title = font.render(f"Aced Questions in {state.current_part.replace('1', ' 1').replace('2', ' 2').replace('3', ' 3').replace('4', ' 4').capitalize()}", True, BLACK)
+    screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 50))
+    for btn in buttons:
+        btn.update_hover(mouse_pos)
+        for event in events:
+            btn.handle_event(event)
+        btn.draw(screen)
+    
+    copyright_surf = font.render(COPYRIGHT_TEXT, True, BLACK)
+    screen.blit(copyright_surf, (20, SCREEN_HEIGHT - 40))
+
+def handle_aced_select(state, events, mouse_pos):
+    screen.fill(WHITE)
+    button_width = 200  # Minimum width
+    button_height = 50
+    spacing = 20
+    num_columns = 3
+    total_buttons = len(SUBJECT_PARTS)  # Define total_buttons
+    buttons_per_column = (total_buttons + num_columns - 1) // num_columns  # Ceiling division
+    total_columns = (total_buttons + buttons_per_column - 1) // buttons_per_column  # Actual number of columns needed
+    total_width = total_columns * button_width + (total_columns - 1) * spacing
+    left_margin = (SCREEN_WIDTH - total_width) // 2  # Center the entire grid
+    start_y = 100
+
+    buttons = []
+    current_index = 0
+    for col in range(total_columns):
+        x = left_margin + col * (button_width + spacing)
+        num_buttons = min(buttons_per_column, total_buttons - current_index)
+        column_parts = SUBJECT_PARTS[current_index:current_index + num_buttons]
+        current_index += num_buttons
+        for i, part in enumerate(column_parts):
+            y = start_y + i * (button_height + spacing)
+            btn = Button(
+                x, y, button_width, button_height,
+                part.replace('1', ' 1').replace('2', ' 2').replace('3', ' 3').replace('4', ' 4').capitalize(),
+                lambda p=part: setattr(state, 'current_part', p) or setattr(state, 'current_screen', 'aced_section_select'),
+                icon=FOLDER_ICON
+            )
+            buttons.append(btn)
+
+    # Add back button at the bottom, centered
+    back_btn = Button(
+        SCREEN_WIDTH // 2 - button_width // 2, SCREEN_HEIGHT - button_height - 20,
+        button_width, button_height, "Back",
+        lambda: setattr(state, 'current_screen', 'main_menu'),
+        icon=DRIVE_ICON
+    )
+    buttons.append(back_btn)
+
+    title = font.render("Select Subject Part for Aced Questions", True, BLACK)
+    screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 50))
+    for btn in buttons:
+        btn.update_hover(mouse_pos)
+        for event in events:
+            btn.handle_event(event)
+        btn.draw(screen)
+    copyright_surf = font.render(COPYRIGHT_TEXT, True, BLACK)
+    screen.blit(copyright_surf, (20, SCREEN_HEIGHT - 40))
+
+def handle_quiz_screen(state, events, mouse_pos):
+    if state.current_screen != "quiz":
+        return
+    
+    # Update button states every frame
+    state.quiz.update_button_states()
+    
+    # Define popup variables upfront
+    popup_width, popup_height = 400, 200
+    popup_x = (SCREEN_WIDTH - popup_width) // 2
+    popup_y = (SCREEN_HEIGHT - popup_height) // 2
+    yes_btn = None
+    no_btn = None
+    
+    # Handle events based on confirmation state
+    if state.main_menu_confirmation or state.reset_timer_confirmation:
+        if state.main_menu_confirmation:
+            yes_btn = Button(popup_x + popup_width // 4 - 40, popup_y + 120, 80, 40, "Yes", lambda: state.quiz.confirm_main_menu(True))
+            no_btn = Button(popup_x + 3 * popup_width // 4 - 40, popup_y + 120, 80, 40, "No", lambda: state.quiz.confirm_main_menu(False))
+        elif state.reset_timer_confirmation:
+            yes_btn = Button(popup_x + popup_width // 4 - 40, popup_y + 120, 80, 40, "Yes", lambda: state.quiz.confirm_reset_timer(True))
+            no_btn = Button(popup_x + 3 * popup_width // 4 - 40, popup_y + 120, 80, 40, "No", lambda: state.quiz.confirm_reset_timer(False))
+        
+        for event in events:
+            if yes_btn:
+                yes_btn.handle_event(event)
+            if no_btn:
+                no_btn.handle_event(event)
+    else:
+        # Handle regular quiz screen events
+        for btn in state.quiz.buttons:
+            btn.update_hover(mouse_pos)
+            for event in events:
+                btn.handle_event(event)
+        if state.quiz.ace_button:
+            state.quiz.ace_button.update_hover(mouse_pos)
+            for event in events:
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    state.quiz.ace_button.handle_event(event)
+                    state.quiz.ace_button = None  # Clear after single click
+                    break  # Process only one click per frame
+        for event in events:
+            state.quiz.answer_box.handle_event(event)
+            state.quiz.solution_sheet.handle_event(event, state.quiz)
+    
+    # Draw the quiz screen
+    state.quiz.draw(screen)
+    
+    # Draw confirmation popups
+    if state.main_menu_confirmation:
+        pygame.draw.rect(screen, GRAY, (popup_x, popup_y, popup_width, popup_height))
+        wrapped_lines = textwrap.wrap("Return to Main Menu?", width=(popup_width - 40) // font.size(" ")[0])
+        max_line_width = max([font.size(line)[0] for line in wrapped_lines], default=0)
+        text_x = popup_x + (popup_width - max_line_width) // 2
+        text_y = popup_y + 20
+        for line in wrapped_lines:
+            text_surface = font.render(line, True, BLACK)
+            screen.blit(text_surface, (text_x, text_y))
+            text_y += font.get_height()
+        if yes_btn and no_btn:
+            yes_btn.update_hover(mouse_pos)
+            no_btn.update_hover(mouse_pos)
+            yes_btn.draw(screen)
+            no_btn.draw(screen)
+    elif state.reset_timer_confirmation:
+        pygame.draw.rect(screen, GRAY, (popup_x, popup_y, popup_width, popup_height))
+        wrapped_lines = textwrap.wrap("Are you sure you want to reset the timer?", width=(popup_width - 40) // font.size(" ")[0])
+        max_line_width = max([font.size(line)[0] for line in wrapped_lines], default=0)
+        text_x = popup_x + (popup_width - max_line_width) // 2
+        text_y = popup_y + 20
+        for line in wrapped_lines:
+            text_surface = font.render(line, True, BLACK)
+            screen.blit(text_surface, (text_x, text_y))
+            text_y += font.get_height()
+        if yes_btn and no_btn:
+            yes_btn.update_hover(mouse_pos)
+            no_btn.update_hover(mouse_pos)
+            yes_btn.draw(screen)
+            no_btn.draw(screen)
+        
+def handle_section_selection(state, events, mouse_pos):
+    screen.fill(WHITE)
+    button_width = 320  # Increased from 300
+    button_height = 50
+    spacing = 20
+    sections = state.all_data[state.current_part].get("sections", {})
+    start_y = 100
+    y = start_y
+    buttons = []
+    
+    for section_key, section_data in sections.items():
+        section_name = section_data.get("section_name", section_key.capitalize())
+        btn = Button(
+            0, y, button_width, button_height,
+            section_name,
+            lambda sk=section_key: state.start_new_session(state.current_part, [sk]),
+            icon=FOLDER_ICON
+        )
+        btn.x = SCREEN_WIDTH // 2 - btn.width // 2
+        btn.rect.x = btn.x
+        buttons.append(btn)
+        y += btn.height + spacing
+    
+    all_btn = Button(
+        0, y, button_width, button_height,
+        "All Sections",
+        lambda: state.start_new_session(state.current_part, list(sections.keys())),
+        icon=FOLDER_ICON
+    )
+    all_btn.x = SCREEN_WIDTH // 2 - all_btn.width // 2
+    all_btn.rect.x = all_btn.x
+    buttons.append(all_btn)
+    y += all_btn.height + spacing
+    
+    back_btn = Button(
+        0, y, button_width, button_height,
+        "Back",
+        lambda: setattr(state, 'current_screen', 'part_select'),
+        icon=DRIVE_ICON
+    )
+    back_btn.x = SCREEN_WIDTH // 2 - back_btn.width // 2
+    back_btn.rect.x = back_btn.x
+    buttons.append(back_btn)
+    
+    title = font.render(f"Select Sections for {state.current_part.replace('1', ' 1').replace('2', ' 2').replace('3', ' 3').replace('4', ' 4').capitalize()}", True, BLACK)
+    screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 50))
+    for btn in buttons:
+        btn.update_hover(mouse_pos)
+        for event in events:
+            btn.handle_event(event)
+        btn.draw(screen)
+    
+    copyright_surf = font.render(COPYRIGHT_TEXT, True, BLACK)
+    screen.blit(copyright_surf, (20, SCREEN_HEIGHT - 40))
 
 # Main game loop
 def main():
-    global skip_loading
+    """Main game loop with functional item-by-item JSON preloading."""
+    initialize_json_files()
+    
     state = GameState()
     state.quiz = QuizScreen(state)
     state.settings = SettingsScreen(state)
     state.aced_view = AcedViewScreen(state)
 
-    # Load all JSON files at startup
+    # Preload all JSON files with a loading screen
+    total_files = len(SUBJECT_PARTS)
+    loaded_files = 0
     for part in SUBJECT_PARTS:
-        filepath = os.path.join(DATA_DIR, f"{part}.json")
-        try:
-            with open(filepath, 'r', encoding='utf-8') as f:
-                state.all_data[part] = json.load(f)
-        except Exception as e:
-            print(f"Error loading {filepath}: {e}")
-            state.all_data[part] = {"sections": {}}
-
-    # Generate loading messages
-    for part, data in state.all_data.items():
-        for section_key, section in data.get("sections", {}).items():
-            section_name = section.get("section_name", section_key)
-            for question in section.get("questions", []):
-                question_id = question.get("id", "Unknown")
-                message = f"Loading {part}.json - Section {section_name}, Question {question_id}"
-                state.loading_messages.append(message)
+        filename = f"{part}.json"
+        filepath = os.path.join(DATA_DIR, filename)
+        data = load_json(filepath)
+        message = f"Loaded from {filepath}"
+        draw_loading_screen(screen, message)
+        state.all_data[part] = data
+        loaded_files += 1
+        # Optional: Add a progress indicator (e.g., "X/Y files loaded")
+        progress_message = f"{loaded_files}/{total_files} files loaded"
+        progress_text = font.render(progress_message, True, WHITE)
+        progress_rect = progress_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 50))
+        screen.blit(progress_text, progress_rect)
+        pygame.display.flip()
+    
+    # Load aced questions after all data is preloaded
+    state.load_aced_questions()
 
     while True:
-        mouse_pos = pygame.mouse.get_pos()
         events = pygame.event.get()
-
+        mouse_pos = pygame.mouse.get_pos()
         for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            if state.current_screen == "quiz" and event.type == pygame.MOUSEWHEEL:
+                if pygame.Rect(30, 100, 500, 500).collidepoint(mouse_pos) and state.quiz.question_image_height > 500:
+                    state.quiz.question_scroll_y = max(0, min(state.quiz.question_scroll_y - event.y * 30, state.quiz.question_image_height - 500))
+                    print(f"Mouse wheel event: Adjusted scroll_y to {state.quiz.question_scroll_y}")
 
         screen.fill(WHITE)
-
-        if state.current_screen == "loading":
-            # Process multiple messages per frame for speed
-            messages_per_frame = 5  # Adjust this value to control speed
-            if state.loading_index < len(state.loading_messages):
-                # Process up to messages_per_frame or remaining messages
-                for _ in range(min(messages_per_frame, len(state.loading_messages) - state.loading_index)):
-                    if state.loading_index < len(state.loading_messages):
-                        loading_text = state.loading_messages[state.loading_index]
-                        print(loading_text)  # Print to console
-                        state.loading_index += 1
-            else:
-                state.current_screen = "main_menu"
-                loading_text = "Loading complete"
-
-            # Draw the current loading message on the screen
-            screen.fill(BLACK)
-            text = font.render(loading_text, True, WHITE)
-            text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
-            screen.blit(text, text_rect)
-
-        elif state.current_screen == "main_menu":
+        if state.current_screen == "main_menu":
             handle_main_menu(state, events, mouse_pos)
         elif state.current_screen == "part_select":
             handle_part_selection(state, events, mouse_pos)
@@ -1600,40 +1800,34 @@ def main():
             handle_section_selection(state, events, mouse_pos)
         elif state.current_screen == "quiz":
             handle_quiz_screen(state, events, mouse_pos)
-        elif state.current_screen == "settings":
-            handle_settings_screen(state, events, mouse_pos)
         elif state.current_screen == "aced_select":
             handle_aced_select(state, events, mouse_pos)
         elif state.current_screen == "aced_section_select":
             handle_aced_section_select(state, events, mouse_pos)
-        if state.current_screen == "aced_view":
-            # Check if there are no aced questions
-            aced_list = state.aced_questions[state.aced_view.state.current_part][state.aced_view.state.current_section]
-            if not aced_list:
-                back_btn = Button(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2, 200, 50, "Back",
-                                  lambda: setattr(state, 'current_screen', 'main_menu'))
-                back_btn.update_hover(mouse_pos)
-                for event in events:
-                    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                        back_btn.handle_event(event)
-            for btn in state.aced_view.buttons:
-                btn.update_hover(mouse_pos)
-                for event in events:
-                    btn.handle_event(event)  # Already restricted to left-click
-            for event in events:
-                # Restrict to left mouse button only
-                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    state.aced_view.handle_image_click(event.pos)
-                    if state.aced_view.close_button and state.aced_view.close_button.rect.collidepoint(event.pos):
-                        state.aced_view.close_button.handle_event(event)
-                    if state.aced_view.solution_sheet.preview_active:
-                        state.aced_view.solution_sheet.handle_event(event, state.aced_view)
-            state.aced_view.handle_slider(mouse_pos, events)
+        elif state.current_screen == "aced_view":
             state.aced_view.draw(screen)
+            if state.aced_view.unace_confirmation:
+                popup_width, popup_height = 400, 200
+                popup_x, popup_y = (SCREEN_WIDTH - popup_width) // 2, (SCREEN_HEIGHT - popup_height) // 2
+                yes_btn = Button(popup_x + 100, popup_y + 120, 80, 40, "Yes", lambda: state.aced_view.confirm_unace(True))
+                no_btn = Button(popup_x + 220, popup_y + 120, 80, 40, "No", lambda: state.aced_view.confirm_unace(False))
+                for event in events:
+                    yes_btn.handle_event(event)
+                    no_btn.handle_event(event)
+            else:
+                aced_list = state.aced_view.state.aced_questions[state.aced_view.state.current_part][state.aced_view.state.current_section]
+                for event in events:
+                    state.aced_view.handle_slider(mouse_pos, [event])
+                    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                        state.aced_view.handle_image_click(event.pos)
+                    for btn in state.aced_view.buttons:
+                        btn.handle_event(event)
+                    if not aced_list:
+                        state.aced_view.no_aced_back_btn.handle_event(event)
+        elif state.current_screen == "settings":
+            handle_settings_screen(state, events, mouse_pos)
 
         pygame.display.flip()
-        clock.tick(30)  # 30 FPS
-
+        clock.tick(30)
 if __name__ == "__main__":
-    initialize_json_files()
     main()
