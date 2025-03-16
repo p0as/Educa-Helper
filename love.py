@@ -597,14 +597,24 @@ class GameState:
     def ace_question(self):
         print(f"Acing question {self.current_question['id']}")  # Debug with ID
         if not self.current_question or not self.current_session['remaining']:
+            print("No current question or remaining questions to ace")
             return
         question_id = self.current_question['id']
+        # Check if already aced globally, not just in session
+        already_aced_globally = any(q['id'] == question_id for section in self.current_sections
+                                    for q in self.aced_questions[self.current_part].get(section, []))
+        if already_aced_globally:
+            print(f"Question {question_id} already aced globally, skipping")
+            self.quiz.ace_button = None
+            return
         if question_id in self.current_session['aced_in_session']:
             print(f"Question {question_id} already aced in this session, skipping")
+            self.quiz.ace_button = None
             return
         for section in self.current_sections:
             questions = self.load_questions(self.current_part, section)
             if any(q['id'] == question_id for q in questions):
+                print(f"Saving question {question_id} as aced in section {section}")
                 self.save_aced_question(self.current_part, section, self.current_question.copy())
                 self.current_session['remaining'] = [q for q in self.current_session['remaining'] if q['id'] != question_id]
                 self.current_session['aced_in_session'].add(question_id)
@@ -622,6 +632,7 @@ class GameState:
                     self.current_question = self.current_session['remaining'][self.current_question_index] if self.current_session['remaining'] else None
                 self.quiz.ace_button = None  # Clear ace button after acing
                 self.tries_left = 3  # Reset tries after acing
+                print(f"Question {question_id} aced successfully. Remaining questions: {len(self.current_session['remaining'])}")
                 break
 
     def show_completion_message(self):
@@ -657,7 +668,8 @@ class GameState:
 
         if not any(q['id'] == question['id'] for q in sections[section]['aced_questions']):
             sections[section]['aced_questions'].append(question)
-            self.aced_questions[part][section].append(question)
+            self.aced_questions[part][section] = sections[section]['aced_questions']  # Sync in-memory state
+            print(f"Saved question {question['id']} to aced_questions in {part}/{section}. Total aced: {len(sections[section]['aced_questions'])}")
 
         self.save_questions(part, data)
 
@@ -1651,9 +1663,10 @@ def handle_quiz_screen(state, events, mouse_pos):
             state.quiz.ace_button.update_hover(mouse_pos)
             for event in events:
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    state.quiz.ace_button.handle_event(event)
-                    state.quiz.ace_button = None  # Clear after single click
-                    break  # Process only one click per frame
+                    if state.quiz.ace_button.rect.collidepoint(event.pos):
+                        state.quiz.ace_button.callback()  # Execute the callback explicitly
+                        print(f"Ace button clicked for question {state.quiz.state.current_question['id']}")  # Debug
+                        state.quiz.ace_button = None  # Clear after execution
         for event in events:
             state.quiz.answer_box.handle_event(event)
             state.quiz.solution_sheet.handle_event(event, state.quiz)
