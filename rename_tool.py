@@ -3,32 +3,19 @@ import shutil
 import re
 
 def rename_images(source_dir, destination_dir):
-    """
-    Renames and copies image files from the source directory to the destination directory based on a shorthand
-    naming convention.
-
-    :param source_dir: Directory containing shorthand-named image files (e.g., 'sample').
-    :param destination_dir: Directory where renamed files will be copied (e.g., 'images/processed').
-    """
-    # Create the destination directory if it doesn't exist
     os.makedirs(destination_dir, exist_ok=True)
     
-    # Define regex pattern to match shorthand names: [fs][qa][number].png
-
-    pattern = re.compile(r"([fs])([qa])(\d+)\.png")
+    # regex
+    pattern = re.compile(r"([fst])([qa])(\d+)\.png")
     
-
     for filename in os.listdir(source_dir):
-
         filename_lower = filename.lower()
         match = pattern.match(filename_lower)
         if match:
             section, type_, number = match.groups()
             
-
             number = str(int(number))
             
-
             if section == "f":  # First section
                 if type_ == "q":
                     target_name = f"question{number}.png"
@@ -39,13 +26,16 @@ def rename_images(source_dir, destination_dir):
                     target_name = f"sectionB_question{number}.png"
                 elif type_ == "a":
                     target_name = f"sectionB_answersheet{number}.png"
+            elif section == "t":  # Third section
+                if type_ == "q":
+                    target_name = f"sectionC_question{number}.png"
+                elif type_ == "a":
+                    target_name = f"sectionC_answersheet{number}.png"
             
-
             src_path = os.path.join(source_dir, filename)
             dst_path = os.path.join(destination_dir, target_name)
             
             try:
-
                 shutil.copy(src_path, dst_path)
                 print(f"Copied {filename} to {dst_path}")
             except Exception as e:
@@ -53,9 +43,7 @@ def rename_images(source_dir, destination_dir):
         else:
             print(f"Error parsing {filename}: does not match expected pattern")
 
-
 source_directory = "sample"  
-destination_directory = "images/geometry1"  
-
+destination_directory = "images/arithmetic1"  
 
 rename_images(source_directory, destination_directory)
