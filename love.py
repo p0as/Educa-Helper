@@ -1,13 +1,15 @@
-# -----------------------------------
-#
-#
+# ----------------------------------------------------------
+# Thanks for using educa SAT MATH helper
+# More info about the code in README
+# Changing any variable may lead to the code breaking
+# ----------------------------------------------------------
 
 import pygame  # For graphics
 import sys  # Sys operations like exit
 import json  # Handle json data and transforms into utf-8 encoding in a function for minimum data
 import os  # Filepath operations
 import random  # Any rng aspect
-import textwrap  # Life saver for text display :pray:
+import textwrap  # Life saver for text display
 import math  # Anim calculations mainly
 
 # Pygame mixer
@@ -457,6 +459,20 @@ class Button:
                 self.callback()
                 play_safe(SOUND_BUTTON_CLICK)
 
+    def set_text(self, new_text):
+        self.text = new_text
+        if self.icon:
+            wrap_width = (self.min_width - 56 - 20) // font.size(" ")[0]
+        else:
+            wrap_width = (self.min_width - 20) // font.size(" ")[0]
+        self.lines = textwrap.wrap(new_text, width=wrap_width)
+        text_width = max([font.size(line)[0] for line in self.lines], default=0)
+        if self.icon:
+            self.width = max(self.min_width, 56 + text_width + 20)
+        else:
+            self.width = max(self.min_width, 10 + text_width + 10)
+        self.height = max(self.min_height, len(self.lines) * font.get_height() + 20)
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 class Slider:
     def __init__(self, x, y, width, height, min_value, max_value):
         self.rect = pygame.Rect(x, y, width, height)
@@ -707,12 +723,7 @@ class QuizScreen:
     def skip_question(self):
         if self.state.current_session['remaining']:
             remaining = self.state.current_session['remaining']
-            if self.state.randomize:
-                skipped = remaining.pop(self.current_question_index)
-                remaining.append(skipped)
-                self.current_question_index = (self.current_question_index + 1) % len(remaining)
-            else:
-                self.current_question_index = (self.current_question_index + 1) % len(remaining)
+            self.current_question_index = (self.current_question_index + 1) % len(remaining)
             self.state.current_question = remaining[self.current_question_index]
             self.state.show_answer = False
             self.solution_sheet.preview_active = False
@@ -1188,7 +1199,7 @@ class SettingsScreen:
 
     def toggle_randomize(self):
         self.state.randomize = not self.state.randomize
-        self.randomize_button.text = f"Randomize: {'ON' if self.state.randomize else 'OFF'}"
+        self.randomize_button.set_text(f"Randomize: {'ON' if self.state.randomize else 'OFF'}")
         self.save_settings()
 
     def handle_events(self, events):
@@ -1534,7 +1545,6 @@ def main():
             if state.current_screen == "quiz" and event.type == pygame.MOUSEWHEEL:
                 if pygame.Rect(30, 100, 500, 500).collidepoint(mouse_pos) and state.quiz.question_image_height > 500:
                     state.quiz.question_scroll_y = max(0, min(state.quiz.question_scroll_y - event.y * 30, state.quiz.question_image_height - 500))
-                    print(f"Mouse wheel event: Adjusted scroll_y to {state.quiz.question_scroll_y}")
         screen.fill(WHITE)
         if state.current_screen == "main_menu":
             handle_main_menu(state, events, mouse_pos)
