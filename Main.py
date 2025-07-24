@@ -1,7 +1,7 @@
 # ----------------------------------------------------------
 # Thanks for using educa SAT MATH helper
 # More info about the code in README
-# Changing any variable may lead to the code breaking
+# Changing any variable may lead to bugs
 # ----------------------------------------------------------
 
 import pygame  # For graphics
@@ -33,7 +33,7 @@ BUTTON_COLOR = (50, 50, 150)
 TEXT_COLOR = (255, 255, 255)
 BUTTON_HOVER_COLOR = (80, 80, 180)
 PROGRESS_BAR_COLOR = (0, 0, 255)
-COPYRIGHT_TEXT = "© Educa College Prep - All Rights of 'sat_data' Reserved, more info on readme"
+COPYRIGHT_TEXT = "© Educa College Prep - All Rights of 'sat_data' Reserved to Educa, more info on readme"
 DATA_DIR = "sat_data"
 
 # List of current subjects
@@ -94,9 +94,7 @@ else:
 # Volume and animation settings
 VOLUMES = {'click': 1.0, 'correct': 1.0, 'incorrect': 1.0}
 ANIMATION_DURATION = 2000
-SUBMIT_COOLDOWN = 5000  # 5 sec in milliseconds
-#                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# BEWARE THAT BY CHANGING THESE CONSTANTS THE CODE MAY BREAK
+SUBMIT_COOLDOWN = 5000  # <<<< Milliseconds btw
 
 # Sound initialization with error handling
 try:
@@ -542,7 +540,11 @@ class GameState:
             return
         self.current_session['remaining'] = all_questions
         if self.randomize:
+            random.seed()  # Reseed to ensure a fresh shuffle each time
             random.shuffle(self.current_session['remaining'])
+            print("Questions shuffled for this session")
+        else:
+            print("Questions presented in original order from JSON")
         self.current_session['total_questions'] = len(self.current_session['remaining']) + sum(len(self.aced_questions[subject_part].get(section, [])) for section in sections)
         self.current_screen = "quiz"
         self.current_question_index = 0
@@ -661,7 +663,7 @@ class GameState:
         self.quiz_start_time = pygame.time.get_ticks()
         self.last_submit_time = 0
         play_safe(SOUND_BUTTON_CLICK)
-
+        
 class QuizScreen:
     def __init__(self, state):
         self.state = state
@@ -1516,8 +1518,8 @@ def handle_section_selection(state, events, mouse_pos):
 def main():
     initialize_json_files()
     state = GameState()
+    state.settings = SettingsScreen(state) 
     state.quiz = QuizScreen(state)
-    state.settings = SettingsScreen(state)
     state.aced_view = AcedViewScreen(state)
     total_files = len(SUBJECT_PARTS)
     loaded_files = 0
